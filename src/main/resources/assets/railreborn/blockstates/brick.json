@@ -1,0 +1,19 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"model": "minecraft:cube_all"
+	}, "variants": {
+		"property": {
+			"coke_oven": {
+				"textures": {
+					"all": "railreborn:block/coke_oven"
+				}
+			},
+			"blast_furnace": {
+				"textures": {
+					"all": "railreborn:block/blast_furnace"
+				}
+			}
+		}
+	}
+}

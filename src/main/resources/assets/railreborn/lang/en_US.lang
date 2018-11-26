@@ -1,0 +1,54 @@
+﻿
+itemGroup.railReborn.items=Rail Reborn: Items
+itemGroup.railReborn.blocks=Rail Reborn: Blocks
+
+item.misc.coke.name=Coal Coke
+item.misc.coal_dust.name=Dust of Coal
+item.misc.charcoal_dust.name=Dust of Charcoal
+item.misc.coke_dust.name=Dust of Coal Coke
+item.misc.lapis_dust.name=Dust of Lapis Lazuli
+item.misc.quartz_dust.name=Dust of Certus Quartz
+item.misc.diamond_dust.name=Dust of Diamond
+item.misc.crushed_obsidian.name=Crushed Obsidian
+item.misc.gold_plated_gear.name=Gold Plated Gear
+item.misc.gear_bushing.name=Gear Bushing
+item.railReborn.iron.dust.name=Dust of Iron
+item.railReborn.iron.plate.name=Iron Plate
+item.railReborn.iron.gear.name=Iron Gear
+item.railReborn.gold.dust.name=Dust of Gold
+item.railReborn.gold.plate.name=Gold Plate
+item.railReborn.gold.gear.name=Gold Gear
+item.railReborn.steel.ingot.name=Steel Ingot
+item.railReborn.steel.nugget.name=Steel Nugget
+item.railReborn.steel.dust.name=Dust of Steel
+item.railReborn.steel.plate.name=Steel Plate
+item.railReborn.steel.gear.name=Steel Gear
+item.railReborn.stainless_steel.ingot.name=Stainless Steel Ingot
+item.railReborn.stainless_steel.nugget.name=Stainless Steel Nugget
+item.railReborn.stainless_steel.dust.name=Dust of Stainless Steel
+item.railReborn.stainless_steel.plate.name=Stainless Steel Plate
+item.railReborn.stainless_steel.gear.name=Stainless Steel Gear
+item.railReborn.chrome.ingot.name=Chrome Ingot
+item.railReborn.chrome.nugget.name=Chrome Nugget
+item.railReborn.chrome.dust.name=Dust of Chrome
+item.crowbar_iron.name=Iron Crowbar
+item.crowbar_steel.name=Steel Crowbar
+item.crowbar_stainless.name=Stainless Steel Crowbar
+
+tile.railReborn.coal_coke_block.name=Block of Coal Coke
+tile.railReborn.tin_ore.name=Tin Ore
+tile.railReborn.chrome_ore.name=Chrome Ore
+tile.railReborn.block.steel.name=Block of Steel
+tile.railReborn.block.stainless_steel.name=Block of Stainless Steel
+tile.railReborn.block.chrome.name=Block of Chrome
+tile.railReborn.brick.coke_oven.name=Sand Brick
+tile.railReborn.brick.blast_furnace.name=Ashen Brick
+tile.railReborn.core.coke_oven.name=Coke Oven Core
+tile.railReborn.core.blast_furnace.name=Blast Furnace Core
+tile.railReborn.part.coke_oven.name=Coke Oven Brick
+tile.railReborn.part.blast_furnace.name=Blast Furnace Brick
+
+tooltip.safe_for_decoration=Safe for decoration
+tooltip.not_multiblock_part=This is NOT a part of the multiblock!
+tooltip.prevents_spawn=Creatures won't spawn on this tile
+tooltip.crowbars=Works as wrench. Also pretty decent weapon for some alien invasion.

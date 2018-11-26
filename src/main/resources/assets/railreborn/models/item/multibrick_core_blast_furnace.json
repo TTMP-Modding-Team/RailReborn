@@ -1,0 +1,8 @@
+{
+	"parent": "block/orientable",
+	"textures": {
+		"top": "railreborn:block/blast_furnace",
+		"front": "railreborn:block/blast_furnace_core",
+		"side": "railreborn:block/blast_furnace"
+	}
+}

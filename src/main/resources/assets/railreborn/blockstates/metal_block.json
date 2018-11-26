@@ -1,0 +1,24 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"model": "minecraft:cube_all"
+	}, "variants": {
+		"property": {
+			"steel": {
+				"textures": {
+					"all": "railreborn:block/steel_block"
+				}
+			},
+			"stainless_steel": {
+				"textures": {
+					"all": "railreborn:block/stainless_block"
+				}
+			},
+			"chrome": {
+				"textures": {
+					"all": "railreborn:block/chrome_block"
+				}
+			}
+		}
+	}
+}

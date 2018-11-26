@@ -1,0 +1,16 @@
+[
+{
+  "modid": "railreborn",
+  "name": "Rail Reborn",
+  "description": "Fucking placeholder mod.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Tictim"],
+  "credits": "u",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
