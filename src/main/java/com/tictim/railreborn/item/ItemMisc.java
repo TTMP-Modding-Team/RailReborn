@@ -1,6 +1,7 @@
 package com.tictim.railreborn.item;
 
 import static com.tictim.railreborn.item.ModItems.mrl;
+
 import com.tictim.railreborn.enums.Misc;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;

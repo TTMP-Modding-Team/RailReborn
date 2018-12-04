@@ -2,6 +2,7 @@ package com.tictim.railreborn.inventory;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.NonNullList;
 
 public class InventoryResizable extends InventoryFixed{
@@ -22,7 +23,8 @@ public class InventoryResizable extends InventoryFixed{
 	}
 	
 	@Override
-	protected void reset(NBTTagCompound nbt){
+	public void deserializeNBT(NBTTagCompound nbt){
 		this.reset(nbt.getInteger("size"));
+		super.deserializeNBT(nbt);
 	}
 }

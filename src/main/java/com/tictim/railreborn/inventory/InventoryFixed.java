@@ -1,5 +1,7 @@
 package com.tictim.railreborn.inventory;
 
+import com.tictim.railreborn.RailReborn;
+import com.tictim.railreborn.util.NBTTypes;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -56,8 +58,7 @@ public class InventoryFixed extends Inventory{
 	@Override
 	public void setInventorySlotContents(int index, ItemStack stack){
 		this.inv.set(index, stack);
-		if(!stack.isEmpty()&&stack.getCount()>this.getInventoryStackLimit())
-			stack.setCount(this.getInventoryStackLimit());
+		if(!stack.isEmpty()&&stack.getCount()>this.getInventoryStackLimit()) stack.setCount(this.getInventoryStackLimit());
 		this.markDirty();
 	}
 	
@@ -68,9 +69,6 @@ public class InventoryFixed extends Inventory{
 	
 	@Override
 	public NBTTagCompound serializeNBT(NBTTagCompound nbt){
-		
-		//if(mutable) nbt.setBoolean("mutable", this.mutable);
-		//else
 		NBTTagList list = new NBTTagList();
 		for(int i = 0; i<this.inv.size(); i++){
 			ItemStack s = this.inv.get(i);
@@ -86,35 +84,16 @@ public class InventoryFixed extends Inventory{
 	
 	@Override
 	public void deserializeNBT(NBTTagCompound nbt){
-		/*
-		if(this.mutable = nbt.getBoolean("mutable")){
-			this.resetToMutable();
-			if(nbt.hasKey("inventory", 9)){
-				NBTTagList list = nbt.getTagList("inventory", 9);
-				for(int i = 0; i<list.tagCount(); i++){
-					NBTTagCompound subnbt = list.getCompoundTagAt(i);
-					this.inv.add(new ItemStack(subnbt));
-				}
-			}
-		}else{
-		*/
-		reset(nbt);
-		int size = nbt.getInteger("size");
-		this.reset(size);
-		if(nbt.hasKey("inventory", 9)){
-			NBTTagList list = nbt.getTagList("inventory", 9);
+		if(nbt.hasKey("inventory", NBTTypes.LIST)){
+			NBTTagList list = nbt.getTagList("inventory", NBTTypes.COMPOUND);
 			for(int i = 0; i<list.tagCount(); i++){
 				NBTTagCompound subnbt = list.getCompoundTagAt(i);
 				int idx = subnbt.getInteger("_idx");
-				if(idx>=0&&idx<size){
+				if(idx >= 0&&idx<inv.size()){
 					this.inv.set(idx, new ItemStack(subnbt));
 				}
 			}
 		}
 		super.deserializeNBT(nbt);
-	}
-	
-	protected void reset(NBTTagCompound nbt) {
-		this.clear();
 	}
 }

@@ -75,11 +75,11 @@ public final class ModItems{
 	}
 	
 	public static void registerOreDict(){
-		for(Misc m : Misc.values()){
+		for(Misc m: Misc.values()){
 			String[] oreDict = m.getOreDict();
 			if(oreDict.length>0){
 				ItemStack of = m.of();
-				for(String oreName : oreDict)
+				for(String oreName: oreDict)
 					OreDictionary.registerOre(oreName, of);
 			}
 		}
@@ -98,7 +98,7 @@ public final class ModItems{
 	
 	@SideOnly(Side.CLIENT)
 	public static void registerModels(){
-		for(Misc m : Misc.values())
+		for(Misc m: Misc.values())
 			ModelLoader.setCustomModelResourceLocation(MISC, m.ordinal(), mrl("misc/"+m.name().toLowerCase()));
 		IRON.registerModels("iron");
 		GOLD.registerModels("gold");

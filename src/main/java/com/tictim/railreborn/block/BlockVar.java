@@ -2,6 +2,7 @@ package com.tictim.railreborn.block;
 
 import java.util.Collections;
 import java.util.List;
+
 import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -15,20 +16,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.NonNullList;
 
-public abstract class BlockVar<E extends Enum<E> & IStringSerializable>extends Block{
-	public static <E extends Enum<E> & IStringSerializable> BlockVar<E> create(
-			Material m, SoundType s, Class<E> e, E... vars
-	){
+public abstract class BlockVar<E extends Enum<E>&IStringSerializable> extends Block{
+	public static <E extends Enum<E>&IStringSerializable> BlockVar<E> create(Material m, SoundType s, Class<E> e, E... vars){
 		return create(m, s, PropertyEnum.create("property", e, vars));
 	}
 	
-	public static <E extends Enum<E> & IStringSerializable> BlockVar<E> create(Material m, SoundType s, Class<E> e){
+	public static <E extends Enum<E>&IStringSerializable> BlockVar<E> create(Material m, SoundType s, Class<E> e){
 		return create(m, s, PropertyEnum.create("property", e));
 	}
 	
-	public static <E extends Enum<E> & IStringSerializable> BlockVar<E> create(
-			Material m, SoundType s, IProperty<E> property
-	){
+	public static <E extends Enum<E>&IStringSerializable> BlockVar<E> create(Material m, SoundType s, IProperty<E> property){
 		List<E> l = Lists.newArrayList(property.getAllowedValues());
 		Collections.sort(l);
 		return new BlockVar<E>(m, s){
@@ -45,7 +42,7 @@ public abstract class BlockVar<E extends Enum<E> & IStringSerializable>extends B
 			
 			@Override
 			public E fromMeta(int meta){
-				return l.get(meta>=0&&meta<l.size() ? meta : 0);
+				return l.get(meta >= 0&&meta<l.size() ? meta : 0);
 			}
 		};
 	}
@@ -53,6 +50,11 @@ public abstract class BlockVar<E extends Enum<E> & IStringSerializable>extends B
 	public BlockVar(Material m, SoundType s){
 		super(m);
 		this.setSoundType(s);
+	}
+	
+	@Override
+	public int damageDropped(IBlockState state){
+		return state.getValue(getProperty()).ordinal();
 	}
 	
 	@Override
@@ -73,4 +75,8 @@ public abstract class BlockVar<E extends Enum<E> & IStringSerializable>extends B
 	public abstract IProperty<E> getProperty();
 	
 	public abstract E fromMeta(int meta);
+	
+	public IBlockState withVar(E value){
+		return this.getDefaultState().withProperty(getProperty(), value);
+	}
 }

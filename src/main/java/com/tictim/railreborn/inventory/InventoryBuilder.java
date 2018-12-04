@@ -1,6 +1,7 @@
 package com.tictim.railreborn.inventory;
 
 import javax.annotation.Nullable;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -9,13 +10,13 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
 /**
- * ¸Å¿ì °£´ÜÇÑ {@link Inventory} ¼³Á¤ Å¬·¡½º. Å¸ÀÏ¿£Æ¼Æ¼µç ¹¹½Ã±âµç °£¿¡ ÀÎ½ºÅÏ½º¿¡ ºÙ¿©³õ°í ±¸ÇöÇÑ ´ÙÀ½ build()¸¸ ¾²¸é Inventory°¡ ¹Ù·Î Æ¢¾î³ª¿È.
+ * ë§¤ìš° ê°„ë‹¨í•œ {@link Inventory} ì„¤ì • í´ë˜ìŠ¤. íƒ€ì¼ì—”í‹°í‹°ë“  ë­ì‹œê¸°ë“  ê°„ì— ì¸ìŠ¤í„´ìŠ¤ì— ë¶™ì—¬ë†“ê³  êµ¬í˜„í•œ ë‹¤ìŒ build()ë§Œ ì“°ë©´ Inventoryê°€ ë°”ë¡œ íŠ€ì–´ë‚˜ì˜´.
+ * @author Tictim
  * @see Inventory
  * @see ItemHandlerFactory
- * @see MarkDirtyListener 
+ * @see MarkDirtyListener
  * @see AccessValidator
  * @see FieldHandler
- * @author Tictim
  */
 public interface InventoryBuilder{
 	default Inventory createInventory(){
@@ -66,13 +67,13 @@ public interface InventoryBuilder{
 	}
 	
 	/**
-	 * {@link IItemHandler}¸¦ »ı¼ºÇÏ´Â ¸ğµâ. InventoryBuilder¿Í °°Àº Å¬·¡½º¿¡ ±¸ÇöÇØ ³õÀ¸¸é ÀÚµ¿À¸·Î Æ÷ÇÔ.
+	 * {@link IItemHandler}ë¥¼ ìƒì„±í•˜ëŠ” ëª¨ë“ˆ. InventoryBuilderì™€ ê°™ì€ í´ë˜ìŠ¤ì— êµ¬í˜„í•´ ë†“ìœ¼ë©´ ìë™ìœ¼ë¡œ í¬í•¨.
 	 * @author Tictim
 	 */
 	@FunctionalInterface
 	public static interface ItemHandlerFactory{
 		/**
-		 * Capability¸¦ ÅëÇØ »ç¿ëµÉ ¼ö ÀÖ´Â ¾ÆÀÌÅÛ ÇÚµé·¯¸¦ »ı¼ºÇÕ´Ï´Ù. nullÀ» ÀÎÀÚ·Î ¹Ş¾Æ »ı¼ºµÇ´Â ¾ÆÀÌÅÛ ÇÚµé·¯´Â ³»ºÎ IItemHandlerÀÇ ±¸Çö¿¡ »ç¿ëµË´Ï´Ù.
+		 * Capabilityë¥¼ í†µí•´ ì‚¬ìš©ë  ìˆ˜ ìˆëŠ” ì•„ì´í…œ í•¸ë“¤ëŸ¬ë¥¼ ìƒì„±í•©ë‹ˆë‹¤. nullì„ ì¸ìë¡œ ë°›ì•„ ìƒì„±ë˜ëŠ” ì•„ì´í…œ í•¸ë“¤ëŸ¬ëŠ” ë‚´ë¶€ IItemHandlerì˜ êµ¬í˜„ì— ì‚¬ìš©ë©ë‹ˆë‹¤.
 		 */
 		IItemHandler create(Inventory inv, @Nullable EnumFacing facing);
 	}
@@ -85,30 +86,30 @@ public interface InventoryBuilder{
 	}
 	
 	/**
-	 * {@link IInventory#markDirty()}¸¦ ¹Ş´Â ¸ğµâ. InventoryBuilder¿Í °°Àº Å¬·¡½º¿¡ ±¸ÇöÇØ ³õÀ¸¸é ÀÚµ¿À¸·Î Æ÷ÇÔ.
+	 * {@link IInventory#markDirty()}ë¥¼ ë°›ëŠ” ëª¨ë“ˆ. InventoryBuilderì™€ ê°™ì€ í´ë˜ìŠ¤ì— êµ¬í˜„í•´ ë†“ìœ¼ë©´ ìë™ìœ¼ë¡œ í¬í•¨.
 	 * @author Tictim
 	 */
 	@FunctionalInterface
 	public static interface MarkDirtyListener{
 		/**
-		 * {@link IInventory#markDirty()}¸¦ ¹Ş¾Æ¼­ È£ÃâµË´Ï´Ù.
+		 * {@link IInventory#markDirty()}ë¥¼ ë°›ì•„ì„œ í˜¸ì¶œë©ë‹ˆë‹¤.
 		 */
 		void markDirty();
 	}
 	
 	/**
-	 * {@link IInventory#isItemValidForSlot()}°ú {@link IInventory#isUsableByPlayer()}¸¦ ¹Ş´Â ¸ğµâ. InventoryBuilder¿Í °°Àº Å¬·¡½º¿¡ ±¸ÇöÇØ ³õÀ¸¸é ÀÚµ¿À¸·Î Æ÷ÇÔ.
+	 * {@link IInventory#isItemValidForSlot()}ê³¼ {@link IInventory#isUsableByPlayer()}ë¥¼ ë°›ëŠ” ëª¨ë“ˆ. InventoryBuilderì™€ ê°™ì€ í´ë˜ìŠ¤ì— êµ¬í˜„í•´ ë†“ìœ¼ë©´ ìë™ìœ¼ë¡œ í¬í•¨.
 	 * @author Tictim
 	 */
 	@FunctionalInterface
 	public static interface AccessValidator{
 		/**
-		 * {@link IInventory#isItemValidForSlot()}¸¦ ¹Ş¾Æ¼­ È£ÃâµË´Ï´Ù.
+		 * {@link IInventory#isItemValidForSlot()}ë¥¼ ë°›ì•„ì„œ í˜¸ì¶œë©ë‹ˆë‹¤.
 		 */
 		boolean isItemValidForSlot(int index, ItemStack stack);
 		
 		/**
-		 * {@link IInventory#isUsableByPlayer()}¸¦ ¹Ş¾Æ¼­ È£ÃâµË´Ï´Ù.
+		 * {@link IInventory#isUsableByPlayer()}ë¥¼ ë°›ì•„ì„œ í˜¸ì¶œë©ë‹ˆë‹¤.
 		 */
 		default boolean isUsableByPlayer(EntityPlayer player){
 			return true;
@@ -116,7 +117,7 @@ public interface InventoryBuilder{
 	}
 	
 	/**
-	 * {@link IInventory}ÀÇ ÇÊµå¸¦ °ü¸®ÇÏ´Â ¸ğµâ. InventoryBuilder¿Í °°Àº Å¬·¡½º¿¡ ±¸ÇöÇØ ³õÀ¸¸é ÀÚµ¿À¸·Î Æ÷ÇÔ.
+	 * {@link IInventory}ì˜ í•„ë“œë¥¼ ê´€ë¦¬í•˜ëŠ” ëª¨ë“ˆ. InventoryBuilderì™€ ê°™ì€ í´ë˜ìŠ¤ì— êµ¬í˜„í•´ ë†“ìœ¼ë©´ ìë™ìœ¼ë¡œ í¬í•¨.
 	 * @author Tictim
 	 */
 	public static interface FieldHandler{

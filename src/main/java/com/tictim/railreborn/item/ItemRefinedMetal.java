@@ -1,6 +1,7 @@
 package com.tictim.railreborn.item;
 
 import static com.tictim.railreborn.item.ModItems.mrl;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.Validate;
 import com.google.common.collect.ImmutableSet;
@@ -58,9 +59,9 @@ public class ItemRefinedMetal extends Item{
 	}
 	
 	public void registerOre(String... prefix){
-		for(Shape s : availableShapes){
+		for(Shape s: availableShapes){
 			ItemStack stack = of(s);
-			for(String p : prefix)
+			for(String p: prefix)
 				OreDictionary.registerOre(s.oreName(p), stack);
 		}
 	}
@@ -79,7 +80,7 @@ public class ItemRefinedMetal extends Item{
 	
 	@Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items){
-		if(this.isInCreativeTab(tab)) for(Shape s : availableShapes)
+		if(this.isInCreativeTab(tab)) for(Shape s: availableShapes)
 			items.add(of(s));
 	}
 }

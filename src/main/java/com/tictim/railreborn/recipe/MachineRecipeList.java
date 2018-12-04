@@ -3,6 +3,7 @@ package com.tictim.railreborn.recipe;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+
 import net.minecraft.item.ItemStack;
 
 public class MachineRecipeList implements MachineRecipe{
@@ -13,7 +14,8 @@ public class MachineRecipeList implements MachineRecipe{
 	}
 	
 	@Override
-	public @Nullable Crafting getCrafting(Machine m){
+	@Nullable
+	public Crafting getCrafting(Machine m){
 		for(int i = 0; i<recipes.size(); i++){
 			MachineRecipe e = recipes.get(i);
 			Crafting c = e.getCrafting(m);
@@ -21,9 +23,10 @@ public class MachineRecipeList implements MachineRecipe{
 		}
 		return null;
 	}
-
+	
 	@Override
-	public @Nullable Crafting getCrafting(ItemStack input){
+	@Nullable
+	public Crafting getCrafting(ItemStack input){
 		for(int i = 0; i<recipes.size(); i++){
 			MachineRecipe e = recipes.get(i);
 			Crafting c = e.getCrafting(input);

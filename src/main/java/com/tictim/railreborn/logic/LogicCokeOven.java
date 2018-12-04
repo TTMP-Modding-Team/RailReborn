@@ -1,6 +1,7 @@
 package com.tictim.railreborn.logic;
 
 import javax.annotation.Nullable;
+
 import com.tictim.railreborn.RailReborn;
 import com.tictim.railreborn.inventory.Inventory;
 import com.tictim.railreborn.inventory.InventoryBuilder;
@@ -20,6 +21,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.config.Config;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -31,7 +33,8 @@ public class LogicCokeOven implements Logic<TileEntity>, InventoryBuilder, Machi
 	private final Inventory inv = this.createInventory();
 	private final FluidTank tank = new FluidTank(16000);
 	
-	private @Nullable Crafting crafting;
+	@Nullable
+	private Crafting crafting;
 	
 	public LogicCokeOven(){
 		tank.setCanFill(false);
@@ -47,7 +50,7 @@ public class LogicCokeOven implements Logic<TileEntity>, InventoryBuilder, Machi
 	
 	@Override
 	public void validate(TileEntity te, @Nullable TestResult multiblockTest){
-		if(multiblockTest!=null) for(BlockPos pos : multiblockTest.getGroup(1)){
+		if(multiblockTest!=null) for(BlockPos pos: multiblockTest.getGroup(1)){
 			TileEntity te2 = te.getWorld().getTileEntity(pos);
 			if(te2 instanceof TEMultibrickPart) ((TEMultibrickPart)te2).setCorePos(te.getPos());
 		}
@@ -56,7 +59,7 @@ public class LogicCokeOven implements Logic<TileEntity>, InventoryBuilder, Machi
 	
 	@Override
 	public void invalidate(TileEntity te, @Nullable TestResult multiblockTest){
-		if(multiblockTest!=null) for(BlockPos pos : multiblockTest.getGroup(1)){
+		if(multiblockTest!=null) for(BlockPos pos: multiblockTest.getGroup(1)){
 			TileEntity te2 = te.getWorld().getTileEntity(pos);
 			if(te2 instanceof TEMultibrickPart) ((TEMultibrickPart)te2).setCorePos(null);
 		}
@@ -166,7 +169,8 @@ public class LogicCokeOven implements Logic<TileEntity>, InventoryBuilder, Machi
 	}
 	
 	@Override
-	public @Nullable <T> T getCapability(Capability<T> cap, EnumFacing facing){
+	@Nullable
+	public <T> T getCapability(Capability<T> cap, EnumFacing facing){
 		if(cap==CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) return (T)this.inv.create(facing);
 		else if(cap==CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) return (T)this.tank;
 		else return null;

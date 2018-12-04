@@ -9,9 +9,6 @@ import com.tictim.railreborn.fluid.ModFluids;
 import com.tictim.railreborn.item.ModItems;
 import com.tictim.railreborn.multiblock.Blueprints;
 import com.tictim.railreborn.recipe.ModRecipes;
-import com.tictim.railreborn.tileentity.TEMultibrick;
-import com.tictim.railreborn.tileentity.TEMultibrickPart;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -20,7 +17,6 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @Mod(modid = RailReborn.MODID, name = RailReborn.NAME, version = RailReborn.VERSION, guiFactory = "com.tictim.railreborn.config.GuiFactory")
 //@EventBusSubscriber(modid = RailReborn.MODID)
@@ -53,9 +49,9 @@ public class RailReborn{
 		ModRecipes.addMachineRecipes();
 		Blueprints.COKE_OVEN.toString();
 		
-		CapabilityManager.INSTANCE.register(RJ.class, new CapabilityStorageNothing(), () -> null);
-		CapabilityManager.INSTANCE.register(Crowbar.class, new CapabilityStorageNothing(), () -> null);
-		GameRegistry.registerTileEntity(TEMultibrick.class, new ResourceLocation(MODID, "multibrick_core"));
-		GameRegistry.registerTileEntity(TEMultibrickPart.class, new ResourceLocation(MODID, "multibrick_part"));
+		CapabilityManager.INSTANCE.register(RJ.class, new CapabilityStorageNothing<>(), () -> null);
+		CapabilityManager.INSTANCE.register(Crowbar.class, new CapabilityStorageNothing<>(), () -> null);
+		
+		proxy.registerTileEntity();
 	}
 }

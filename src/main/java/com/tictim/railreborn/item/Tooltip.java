@@ -1,6 +1,7 @@
 package com.tictim.railreborn.item;
 
 import java.util.List;
+
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.translation.I18n;
@@ -19,7 +20,7 @@ public interface Tooltip{
 		
 		@Override
 		public void addInformation(ItemStack stack, World player, List<String> tooltip, ITooltipFlag advanced){
-			for(String s : this.tooltips)
+			for(String s: this.tooltips)
 				tooltip.add(I18n.translateToLocal(s));
 		}
 	}

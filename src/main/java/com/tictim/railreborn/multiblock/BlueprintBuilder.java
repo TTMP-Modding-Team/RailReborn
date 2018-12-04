@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.lang3.Validate;
 import com.google.common.collect.ImmutableList;
 import com.tictim.railreborn.RailReborn;
@@ -20,7 +21,7 @@ public class BlueprintBuilder{
 	
 	public BlueprintBuilder floor(int floor, String... tiles){
 		LinkedList<String> l = getNthFloor(floor);
-		for(String row : tiles){
+		for(String row: tiles){
 			lengthTest(row.length());
 			l.add(row);
 		}
@@ -30,8 +31,7 @@ public class BlueprintBuilder{
 	public BlueprintBuilder setReplacement(char c, Object obj){
 		if(c==0) throw new IllegalArgumentException("0(char) is invalid replacement key");
 		BlockPredicate r = BlockPredicate.of(obj);
-		if(replacements.containsKey(c))
-			RailReborn.LOGGER.warn("Duplicated Blueprint replacement '{}' with {}, skipping", c, r);
+		if(replacements.containsKey(c)) RailReborn.LOGGER.warn("Duplicated Blueprint replacement '{}' with {}, skipping", c, r);
 		replacements.put(c, r);
 		return this;
 	}
@@ -81,7 +81,7 @@ public class BlueprintBuilder{
 		if(floors.size()==0) throw new IllegalArgumentException("Invalid Y tile size - 0");
 		else{
 			int expected = 0;
-			for(LinkedList<?> floor : floors){
+			for(LinkedList<?> floor: floors){
 				if(floor!=null){
 					if(expected==0){
 						if((expected = floor.size())>0) continue;
@@ -90,19 +90,23 @@ public class BlueprintBuilder{
 				}
 			}
 			if(expected==0) throw new IllegalArgumentException("Empty blueprint");
+			FIND_CENTER:
 			for(int y = 0; y<floors.size(); y++){
 				LinkedList<String> l = floors.get(y);
-				if(l!=null) for(int x = 0; x<expected; x++){
-					String s = l.get(x);
+				if(l!=null) for(int z = 0; z<expected; z++){
+					String s = l.get(z);
 					char[] c = s.toCharArray();
-					for(int z = 0; z<c.length; z++){
-						if(c[z]==center){
-							if(centerPos==null) centerPos = new BlockPos(x, y, z);
-							else throw new IllegalArgumentException("Duplicated center key");
+					for(int x = 0; x<c.length; x++){
+						if(c[x]==center){
+							if(centerPos==null){
+								centerPos = new BlockPos(x, y, z);
+								break FIND_CENTER;
+							}else throw new IllegalArgumentException("Duplicated center key");
 						}
 					}
 				}
 			}
+			if(centerPos==null) throw new IllegalArgumentException("No center block is found");
 		}
 		Floor[] f = new Floor[floors.size()];
 		for(int i = 0; i<floors.size(); i++){

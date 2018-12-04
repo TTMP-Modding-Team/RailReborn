@@ -1,12 +1,13 @@
 package com.tictim.railreborn.tileentity;
 
 import javax.annotation.Nullable;
+
 import com.tictim.railreborn.block.BlockMultibrickCore;
+import com.tictim.railreborn.client.tesr.TESRMultiblockDebug.MultiblockDebugable;
 import com.tictim.railreborn.enums.Multibricks;
 import com.tictim.railreborn.logic.Logic;
 import com.tictim.railreborn.multiblock.Blueprint.TestResult;
 import com.tictim.railreborn.util.NBTTypes;
-import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -16,9 +17,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 
-public class TEMultibrick extends TileEntity implements ITickable{
-	private @Nullable Logic<TileEntity> logic;
-	private @Nullable Multibricks multibrick;
+public class TEMultibrick extends TileEntity implements ITickable, MultiblockDebugable{
+	@Nullable
+	private Logic<TileEntity> logic;
+	@Nullable
+	private Multibricks multibrick;
 	
 	private int tick;
 	private boolean valid;
@@ -41,18 +44,22 @@ public class TEMultibrick extends TileEntity implements ITickable{
 	@Override
 	public void update(){
 		if(!this.world.isRemote&&logic!=null){
-			if((++tick)>=10){
+			if((++tick) >= 10){
 				tick = 0;
-				TestResult r = multibrick.getBlueprint().test(world, pos, world.getBlockState(pos).getValue(BlockHorizontal.FACING));
+				TestResult r = multibrick.getBlueprint().test(world, pos);
 				if(valid!=r.isValid()){
-					if(valid = r.isValid()){
-						logic.validate(this, r);
-						logic.invalidate(this, r);
-					}
+					if(valid = r.isValid()) logic.validate(this, r);
+					else logic.invalidate(this, r);
 				}
 			}
 			if(valid) logic.update();
 		}
+	}
+	
+	@Override
+	@Nullable
+	public TestResult getMultiblockTest(){
+		return multibrick!=null ? multibrick.getBlueprint().test(world, pos) : null;
 	}
 	
 	@Override
@@ -61,7 +68,8 @@ public class TEMultibrick extends TileEntity implements ITickable{
 	}
 	
 	@Override
-	public @Nullable <T> T getCapability(Capability<T> cap, EnumFacing facing){
+	@Nullable
+	public <T> T getCapability(Capability<T> cap, EnumFacing facing){
 		T t = logic!=null ? logic.getCapability(cap, facing) : null;
 		return t!=null ? t : super.getCapability(cap, facing);
 	}

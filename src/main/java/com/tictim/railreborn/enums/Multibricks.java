@@ -11,7 +11,8 @@ import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.MathHelper;
 
 public enum Multibricks implements IStringSerializable{
-	COKE_OVEN, BLAST_FURNACE;
+	COKE_OVEN,
+	BLAST_FURNACE;
 	
 	@Override
 	public String getName(){
@@ -20,19 +21,19 @@ public enum Multibricks implements IStringSerializable{
 	
 	public Logic<TileEntity> createLogic(){
 		switch(this){
-		case BLAST_FURNACE:
-			return new LogicBlastFurnace();
-		default: // case COKE_OVEN:
-			return new LogicCokeOven();
+			case BLAST_FURNACE:
+				return new LogicBlastFurnace();
+			default: // case COKE_OVEN:
+				return new LogicCokeOven();
 		}
 	}
 	
 	public Blueprint getBlueprint(){
 		switch(this){
-		case BLAST_FURNACE:
-			return Blueprints.BLAST_FURNACE;
-		default: // case COKE_OVEN:
-			return Blueprints.COKE_OVEN;
+			case BLAST_FURNACE:
+				return Blueprints.BLAST_FURNACE;
+			default: // case COKE_OVEN:
+				return Blueprints.COKE_OVEN;
 		}
 	}
 	

@@ -41,12 +41,12 @@ tile.railReborn.chrome_ore.name=Chrome Ore
 tile.railReborn.block.steel.name=Block of Steel
 tile.railReborn.block.stainless_steel.name=Block of Stainless Steel
 tile.railReborn.block.chrome.name=Block of Chrome
-tile.railReborn.brick.coke_oven.name=Sand Brick
-tile.railReborn.brick.blast_furnace.name=Ashen Brick
+tile.railReborn.brick.coke_oven.name=Sand Bricks
+tile.railReborn.brick.blast_furnace.name=Ashen Bricks
 tile.railReborn.core.coke_oven.name=Coke Oven Core
 tile.railReborn.core.blast_furnace.name=Blast Furnace Core
-tile.railReborn.part.coke_oven.name=Coke Oven Brick
-tile.railReborn.part.blast_furnace.name=Blast Furnace Brick
+tile.railReborn.part.coke_oven.name=Coke Oven Bricks
+tile.railReborn.part.blast_furnace.name=Blast Furnace Bricks
 
 tooltip.safe_for_decoration=Safe for decoration
 tooltip.not_multiblock_part=This is NOT a part of the multiblock!

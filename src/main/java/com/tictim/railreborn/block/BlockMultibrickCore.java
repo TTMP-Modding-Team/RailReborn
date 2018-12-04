@@ -9,8 +9,8 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityLiving.SpawnPlacementType;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -31,15 +31,14 @@ public class BlockMultibrickCore extends Block{
 	
 	// TODO
 	@Override
-	public boolean onBlockActivated(
-			World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ
-	){
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ){
 		if(!world.isRemote){
 			TileEntity te = world.getTileEntity(pos);
 			
 			if(te instanceof TEMultibrick){
 				TEMultibrick core = (TEMultibrick)te;
 				if(core.isLogicValid()) player.sendMessage(new TextComponentString("The Multibrick is valid!"));
+				else player.sendMessage(new TextComponentString("The Multibrick is NOT valid!"));
 			}
 		}
 		return true;
@@ -56,9 +55,12 @@ public class BlockMultibrickCore extends Block{
 	}
 	
 	@Override
-	public IBlockState getStateForPlacement(
-			World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand
-	){
+	public int damageDropped(IBlockState state){
+		return state.getValue(PROPERTY).ordinal();
+	}
+	
+	@Override
+	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand){
 		return getStateFromMeta(meta).withProperty(BlockHorizontal.FACING, placer.getHorizontalFacing().getOpposite());
 	}
 	

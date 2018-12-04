@@ -2,6 +2,7 @@ package com.tictim.railreborn.recipe;
 
 import java.util.Arrays;
 import javax.annotation.Nullable;
+
 import com.tictim.railreborn.item.IngredientStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,9 +14,12 @@ import net.minecraftforge.items.IItemHandler;
 public final class Crafting implements ITickable{
 	private final Machine handler;
 	
-	private @Nullable IngredientStack[] input;
-	private @Nullable ItemStack[] output;
-	private @Nullable FluidStack[] fluidInput, fluidOutput;
+	@Nullable
+	private IngredientStack[] input;
+	@Nullable
+	private ItemStack[] output;
+	@Nullable
+	private FluidStack[] fluidInput, fluidOutput;
 	
 	private long totalTime, currentTime, timeIncrement = 1;
 	
@@ -44,7 +48,8 @@ public final class Crafting implements ITickable{
 		return this;
 	}
 	
-	private static @Nullable <T> T[] copy(@Nullable T[] original){
+	@Nullable
+	private static <T> T[] copy(@Nullable T[] original){
 		if(original==null) return null;
 		else return Arrays.copyOf(original, original.length);
 	}
@@ -81,9 +86,9 @@ public final class Crafting implements ITickable{
 	}
 	
 	public boolean hasOutput(){
-		if(output!=null&&output.length>0) for(ItemStack s : output)
+		if(output!=null&&output.length>0) for(ItemStack s: output)
 			if(!s.isEmpty()) return true;
-		if(fluidOutput!=null&&fluidOutput.length>0) for(FluidStack s : fluidOutput)
+		if(fluidOutput!=null&&fluidOutput.length>0) for(FluidStack s: fluidOutput)
 			if(s.amount>0) return true;
 		return false;
 	}
@@ -190,7 +195,7 @@ public final class Crafting implements ITickable{
 	
 	public boolean extractInput(IItemHandler handler, boolean simulate){
 		if(this.input!=null&&this.input.length>0){
-			for(IngredientStack ing : input){
+			for(IngredientStack ing: input){
 				int quantity = ing.getQuantity();
 				for(int i = 0, j = handler.getSlots(); i<j; i++){
 					ItemStack s = handler.extractItem(i, 64, simulate);
@@ -207,7 +212,7 @@ public final class Crafting implements ITickable{
 	
 	public boolean insertOutput(IItemHandler handler, boolean simulate){
 		if(this.output!=null&&this.output.length>0){
-			for(ItemStack s : output){
+			for(ItemStack s: output){
 				for(int i = 0, j = handler.getSlots(); i<j; i++){
 					s = handler.insertItem(i, s, simulate);
 					if(s.isEmpty()) break;
@@ -221,7 +226,7 @@ public final class Crafting implements ITickable{
 	
 	public boolean extractFluidInput(IFluidHandler handler, boolean simulate){
 		if(this.fluidInput!=null&&this.fluidInput.length>0){
-			for(FluidStack s : fluidInput){
+			for(FluidStack s: fluidInput){
 				FluidStack s2 = handler.drain(s, !simulate);
 				if(s.amount>s2.amount) return false;
 			}
@@ -231,7 +236,7 @@ public final class Crafting implements ITickable{
 	
 	public boolean insertFluidOutput(IFluidHandler handler, boolean simulate){
 		if(this.fluidOutput!=null&&this.fluidOutput.length>0){
-			for(FluidStack s : fluidOutput){
+			for(FluidStack s: fluidOutput){
 				s = s.copy();
 				s.amount = s.amount-handler.fill(s, !simulate);
 				if(s.amount>0) return false;

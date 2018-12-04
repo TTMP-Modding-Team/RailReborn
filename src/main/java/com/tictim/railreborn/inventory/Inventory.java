@@ -3,6 +3,8 @@ package com.tictim.railreborn.inventory;
 import java.util.EnumMap;
 import java.util.Map;
 import javax.annotation.Nullable;
+
+import com.tictim.railreborn.util.NBTTypes;
 import org.apache.commons.lang3.Validate;
 import com.tictim.railreborn.inventory.InventoryBuilder.AccessValidator;
 import com.tictim.railreborn.inventory.InventoryBuilder.FieldHandler;
@@ -25,9 +27,9 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 /**
- * {@link InventoryBasic}º¸´Ù ³´´Ù
- * @see InventoryBuilder
+ * {@link InventoryBasic}ë³´ë‹¤ ë‚«ë‹¤
  * @author Tictim
+ * @see InventoryBuilder
  */
 public abstract class Inventory implements IInventory, IItemHandlerModifiable, INBTSerializable<NBTTagCompound>{
 	protected IItemHandler delegate = new InvWrapper(this);
@@ -85,7 +87,7 @@ public abstract class Inventory implements IInventory, IItemHandlerModifiable, I
 	public ITextComponent getDisplayName(){
 		return name.getDisplayName();
 	}
-
+	
 	@Override
 	public void setStackInSlot(int slot, ItemStack stack){
 		this.setInventorySlotContents(slot, stack);
@@ -187,7 +189,7 @@ public abstract class Inventory implements IInventory, IItemHandlerModifiable, I
 	@Override
 	public void deserializeNBT(NBTTagCompound nbt){
 		this.name.deserializeNBT(nbt.getCompoundTag("name"));
-		setStackLimit(nbt.hasKey("stackLimit", 1) ? nbt.getByte("stackLimit") : 64);
+		setStackLimit(nbt.hasKey("stackLimit", NBTTypes.BYTE) ? nbt.getByte("stackLimit") : 64);
 	}
 	
 	public static final class Name implements IWorldNameable, INBTSerializable<NBTTagCompound>{

@@ -12,6 +12,6 @@ public final class ModFluids{
 	
 	public static void init(){
 		FluidRegistry.enableUniversalBucket();
-		FluidRegistry.registerFluid(CREOSOTE_OIL);
+		FluidRegistry.addBucketForFluid(CREOSOTE_OIL);
 	}
 }

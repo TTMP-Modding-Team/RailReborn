@@ -2,6 +2,7 @@ package com.tictim.railreborn.block;
 
 import com.tictim.railreborn.RailReborn;
 import com.tictim.railreborn.enums.Metals;
+import com.tictim.railreborn.enums.Multibricks;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -26,19 +27,19 @@ public final class ModBlocks{
 	public static final Block COAL_COKE_BLOCK = new Block(Material.ROCK).setRegistryName("coal_coke_block").setUnlocalizedName("railReborn.coal_coke_block").setHardness(3).setResistance(5).setCreativeTab(TAB_BLOCKS);
 	public static final Block ORE_TIN = new Block(Material.ROCK).setRegistryName("ore_tin").setUnlocalizedName("railReborn.tin_ore").setHardness(3).setResistance(5).setCreativeTab(TAB_BLOCKS);
 	public static final Block ORE_CHROME = new Block(Material.ROCK).setRegistryName("ore_chrome").setUnlocalizedName("railReborn.chrome_ore").setHardness(5).setResistance(10).setCreativeTab(TAB_BLOCKS);
-	public static final BlockVar METAL_BLOCKS = (BlockVar)BlockVar.create(Material.IRON, SoundType.METAL, Metals.class).setRegistryName("metal_block").setUnlocalizedName("railReborn.block").setHardness(5).setResistance(10).setCreativeTab(TAB_BLOCKS);
-	public static final BlockVar BRICKS = (BlockVar)BlockVar.create(Material.ROCK, SoundType.STONE, BlockMultibrickCore.PROPERTY).setRegistryName("brick").setUnlocalizedName("railReborn.brick").setHardness(3).setResistance(5).setCreativeTab(TAB_BLOCKS);
+	public static final BlockVar<Metals> METAL_BLOCKS = (BlockVar<Metals>)BlockVar.create(Material.IRON, SoundType.METAL, Metals.class).setRegistryName("metal_block").setUnlocalizedName("railReborn.block").setHardness(5).setResistance(10).setCreativeTab(TAB_BLOCKS);
+	public static final BlockVar<Multibricks> BRICKS = (BlockVar<Multibricks>)BlockVar.create(Material.ROCK, SoundType.STONE, BlockMultibrickCore.PROPERTY).setRegistryName("brick").setUnlocalizedName("railReborn.brick").setHardness(3).setResistance(5).setCreativeTab(TAB_BLOCKS);
 	public static final Block MULTIBRICK_CORE = new BlockMultibrickCore().setRegistryName("multibrick_core").setUnlocalizedName("railReborn.core").setHardness(3).setResistance(5).setCreativeTab(TAB_BLOCKS);
-	public static final BlockVar MULTIBRICK_PART = (BlockVar)new BlockMultibrickPart().setRegistryName("multibrick_part").setUnlocalizedName("railReborn.part").setHardness(3).setResistance(5).setCreativeTab(TAB_BLOCKS);
+	public static final BlockVar<Multibricks> MULTIBRICK_PART = (BlockVar<Multibricks>)new BlockMultibrickPart().setRegistryName("multibrick_part").setUnlocalizedName("railReborn.part").setHardness(3).setResistance(5).setCreativeTab(TAB_BLOCKS);
 	
 	static{
-		COAL_COKE_BLOCK.setHarvestLevel("pickaxe", 1);
+		COAL_COKE_BLOCK.setHarvestLevel("pickaxe", 0);
 		ORE_TIN.setHarvestLevel("pickaxe", 1);
 		ORE_CHROME.setHarvestLevel("pickaxe", 3);
 		METAL_BLOCKS.setHarvestLevel("pickaxe", 1);
-		BRICKS.setHarvestLevel("pickaxe", 1);
-		MULTIBRICK_CORE.setHarvestLevel("pickaxe", 1);
-		MULTIBRICK_PART.setHarvestLevel("pickaxe", 1);
+		BRICKS.setHarvestLevel("pickaxe", 0);
+		MULTIBRICK_CORE.setHarvestLevel("pickaxe", 0);
+		MULTIBRICK_PART.setHarvestLevel("pickaxe", 0);
 	}
 	
 	@SubscribeEvent

@@ -1,6 +1,7 @@
 package com.tictim.railreborn.inventory;
 
 import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.Validate;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -9,12 +10,13 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 
-public class ContainerBase<TE extends TileEntity>extends Container{
+public class ContainerBase<TE extends TileEntity> extends Container{
 	protected final TE te;
 	protected final IInventory inv;
 	protected final EntityPlayer player;
 	
-	private @Nullable TransferActionWrapper action;
+	@Nullable
+	private TransferActionWrapper action;
 	
 	/**
 	 * @throws ClassCastException If {@code te} is not {@link IInventory} instance
@@ -136,7 +138,8 @@ public class ContainerBase<TE extends TileEntity>extends Container{
 		private final int priority, slotStart, slots;
 		private final TransferAction<TE> action;
 		
-		private @Nullable TransferActionWrapper next;
+		@Nullable
+		private TransferActionWrapper next;
 		
 		private TransferActionWrapper(int priority, int slotStart, int slots, TransferAction action){
 			Validate.notNull(action);
@@ -160,7 +163,7 @@ public class ContainerBase<TE extends TileEntity>extends Container{
 		}
 		
 		public boolean transfer(Slot slot, int index){
-			if(index>=slotStart&&index<slotStart+slots) return action.transfer(slot, index, slotStart, slotStart+slots);
+			if(index >= slotStart&&index<slotStart+slots) return action.transfer(slot, index, slotStart, slotStart+slots);
 			else return false;
 		}
 	}

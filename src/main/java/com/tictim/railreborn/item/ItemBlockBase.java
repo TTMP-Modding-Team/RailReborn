@@ -2,6 +2,7 @@ package com.tictim.railreborn.item;
 
 import java.util.List;
 import javax.annotation.Nullable;
+
 import com.tictim.railreborn.item.Tooltip.TooltipFixed;
 import com.tictim.railreborn.item.Tooltip.TooltipSimple;
 import net.minecraft.block.Block;
@@ -11,11 +12,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 public class ItemBlockBase extends ItemBlock{
+	@Nullable
+	private Tooltip tooltip;
+	
 	public ItemBlockBase(Block block){
 		super(block);
 	}
-	
-	private @Nullable Tooltip tooltip;
 	
 	public ItemBlock setTooltip(int lines){
 		return setTooltip(new TooltipSimple(lines));

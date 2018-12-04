@@ -1,5 +1,6 @@
 package com.tictim.railreborn.multiblock;
 
+import com.google.common.base.MoreObjects;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -9,19 +10,21 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class TransformableBlockAccess implements IBlockAccess{
 	private final MutableBlockPos mpos = new MutableBlockPos();
 	private final IBlockAccess delegate;
 	private final BlockPos centerOrigin;
-	private final MutableBlockPos center = new MutableBlockPos();
+	private final MutableBlockPos center;
 	private final EnumFacing facing;
 	
-	public TransformableBlockAccess(IBlockAccess delegate, BlockPos center, EnumFacing facing){
+	public TransformableBlockAccess(IBlockAccess delegate, BlockPos center, BlockPos offset, EnumFacing facing){
 		if(facing==null||facing==EnumFacing.UP||facing==EnumFacing.DOWN) throw new IllegalArgumentException("facing");
+		
 		this.delegate = delegate;
-		this.center.setPos(this.centerOrigin = center);
 		this.facing = facing;
+		this.center = new MutableBlockPos(this.centerOrigin = center.subtract(offset.rotate(getRotation())));
 	}
 	
 	public MutableBlockPos getCenter(){
@@ -42,32 +45,32 @@ public class TransformableBlockAccess implements IBlockAccess{
 	
 	@SuppressWarnings("incomplete-switch")
 	private BlockPos transform(int x, int y, int z){
-		mpos.setPos(x-center.getX(), y-center.getY(), z-center.getZ());
+		mpos.setPos(x, y, z);
 		switch(getRotation()){
-		case CLOCKWISE_90:
-			mpos.setPos(-mpos.getZ(), mpos.getY(), mpos.getX());
-			break;
-		case CLOCKWISE_180:
-			mpos.setPos(-mpos.getX(), mpos.getY(), -mpos.getZ());
-			break;
-		case COUNTERCLOCKWISE_90:
-			mpos.setPos(mpos.getZ(), mpos.getY(), -mpos.getX());
-			break;
-		// default: case NONE:
+			case CLOCKWISE_90:
+				mpos.setPos(-mpos.getZ(), mpos.getY(), mpos.getX());
+				break;
+			case CLOCKWISE_180:
+				mpos.setPos(-mpos.getX(), mpos.getY(), -mpos.getZ());
+				break;
+			case COUNTERCLOCKWISE_90:
+				mpos.setPos(mpos.getZ(), mpos.getY(), -mpos.getX());
+				break;
+			// default: case NONE:
 		}
-		return mpos;
+		return mpos.add(center.getX(), center.getY(), center.getZ());
 	}
 	
 	private Rotation getRotation(){
 		switch(facing){
-		case EAST:
-			return Rotation.COUNTERCLOCKWISE_90;
-		case SOUTH:
-			return Rotation.CLOCKWISE_180;
-		case WEST:
-			return Rotation.CLOCKWISE_90;
-		default: //	case NORTH: case UP: case DOWN:
-			return Rotation.NONE;
+			case WEST:
+				return Rotation.CLOCKWISE_90;
+			case NORTH:
+				return Rotation.CLOCKWISE_180;
+			case EAST:
+				return Rotation.COUNTERCLOCKWISE_90;
+			default: //	case SOUTH: case UP: case DOWN:
+				return Rotation.NONE;
 		}
 	}
 	
@@ -137,5 +140,10 @@ public class TransformableBlockAccess implements IBlockAccess{
 	
 	public boolean isSideSolid(int x, int y, int z, EnumFacing side, boolean _default){
 		return delegate.isSideSolid(transform(x, y, z), getRotation().rotate(side), _default);
+	}
+	
+	@Override
+	public String toString(){
+		return MoreObjects.toStringHelper(this).add("center", Blueprint.posToStr(this.centerOrigin)).add("facing", this.facing).toString();
 	}
 }

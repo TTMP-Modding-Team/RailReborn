@@ -20,16 +20,14 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class BlockMultibrickPart extends BlockVar{
+public class BlockMultibrickPart extends BlockVar<Multibricks>{
 	public BlockMultibrickPart(){
 		super(Material.ROCK, SoundType.STONE);
 	}
 	
 	// TODO
 	@Override
-	public boolean onBlockActivated(
-			World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ
-	){
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ){
 		TileEntity te = world.getTileEntity(pos);
 		if(te instanceof TEMultibrickPart){
 			TEMultibrickPart part = (TEMultibrickPart)te;
@@ -49,12 +47,12 @@ public class BlockMultibrickPart extends BlockVar{
 	}
 	
 	@Override
-	public IProperty getProperty(){
+	public IProperty<Multibricks> getProperty(){
 		return BlockMultibrickCore.PROPERTY;
 	}
 	
 	@Override
-	public Enum fromMeta(int meta){
+	public Multibricks fromMeta(int meta){
 		return Multibricks.fromMeta(meta);
 	}
 	

@@ -1,6 +1,7 @@
 package com.tictim.railreborn.config;
 
 import java.util.Set;
+
 import com.tictim.railreborn.RailReborn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;

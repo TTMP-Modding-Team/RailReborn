@@ -24,4 +24,20 @@ public class BlockSimplePredicate extends BlockPredicate{
 	public IBlockState example(){
 		return block.getDefaultState();
 	}
+	/*
+	@Override
+	public boolean equals(Object obj){
+		if(obj==null) return false;
+		else if(obj==this) return true;
+		else if(obj instanceof BlockSimplePredicate) {
+			BlockSimplePredicate p = (BlockSimplePredicate)obj;
+			return p.block==this.block;
+		}else return false;
+	}
+	*/
+	
+	@Override
+	public String toString(){
+		return "B:"+block.getRegistryName();
+	}
 }

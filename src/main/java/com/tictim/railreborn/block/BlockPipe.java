@@ -1,6 +1,7 @@
 package com.tictim.railreborn.block;
 
 import java.util.List;
+
 import com.tictim.railreborn.enums.PipeType;
 import com.tictim.railreborn.tileentity.TEPipe;
 import net.minecraft.block.Block;
@@ -24,15 +25,12 @@ public class BlockPipe extends Block{
 	}
 	
 	@Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
-    {
-        return BlockFaceShape.UNDEFINED;
-    }
-    
+	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face){
+		return BlockFaceShape.UNDEFINED;
+	}
+	
 	@Override
-	public void addCollisionBoxToList(
-			IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean isActualState
-	){
+	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean isActualState){
 		addCollisionBoxToList(pos, entityBox, collidingBoxes, state.getCollisionBoundingBox(worldIn, pos));
 	}
 	

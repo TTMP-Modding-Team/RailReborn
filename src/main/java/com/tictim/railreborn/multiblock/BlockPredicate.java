@@ -8,7 +8,22 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
 public abstract class BlockPredicate{
-	public static final BlockSimplePredicate AIR = new BlockSimplePredicate(Blocks.AIR);
+	public static final BlockPredicate AIR = new BlockPredicate(){
+		@Override
+		public boolean matches(IBlockAccess world, BlockPos pos){
+			return world.isAirBlock(pos);
+		}
+		
+		@Override
+		public IBlockState example(){
+			return Blocks.AIR.getDefaultState();
+		}
+		
+		@Override
+		public String toString(){
+			return "AIR";
+		}
+	};
 	public static final BlockPredicate ANY = new BlockPredicate(){
 		@Override
 		public boolean matches(IBlockAccess world, BlockPos pos){
@@ -18,6 +33,11 @@ public abstract class BlockPredicate{
 		@Override
 		public IBlockState example(){
 			return Blocks.AIR.getDefaultState();
+		}
+		
+		@Override
+		public String toString(){
+			return "ANY";
 		}
 	};
 	
@@ -31,8 +51,8 @@ public abstract class BlockPredicate{
 	
 	public static boolean isStateEqualsExceptFacing(IBlockState s1, IBlockState s2){
 		if(s1.getBlock()==s2.getBlock()){
-			for(IProperty<?> p : s1.getPropertyKeys())
-				if(!s1.getValue(p).equals(s2)&&!p.getName().equals("facing")) return false;
+			for(IProperty<?> p: s1.getPropertyKeys())
+				if(!s1.getValue(p).equals(s2.getValue(p))&&!p.getName().equals("facing")) return false;
 			return true;
 		}
 		return false;

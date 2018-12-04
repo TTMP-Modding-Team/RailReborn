@@ -4,7 +4,11 @@ import org.apache.commons.lang3.StringUtils;
 import com.tictim.railreborn.config.RailRebornCfg;
 
 public enum Shape{
-	INGOT, NUGGET, DUST, PLATE, GEAR;
+	INGOT,
+	NUGGET,
+	DUST,
+	PLATE,
+	GEAR;
 	
 	@Override
 	public String toString(){
@@ -13,10 +17,10 @@ public enum Shape{
 	
 	public String oreName(){
 		switch(this){
-		case GEAR:
-			return RailRebornCfg.General.changeGearOreDict ? "railRebornGear" : "gear";
-		default:
-			return this.toString();
+			case GEAR:
+				return RailRebornCfg.General.changeGearOreDict ? "railRebornGear" : "gear";
+			default:
+				return this.toString();
 		}
 	}
 	

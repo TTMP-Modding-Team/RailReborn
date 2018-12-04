@@ -1,6 +1,7 @@
 package com.tictim.railreborn.recipe;
 
 import javax.annotation.Nullable;
+
 import net.minecraft.item.ItemStack;
 
 public interface MachineRecipe{

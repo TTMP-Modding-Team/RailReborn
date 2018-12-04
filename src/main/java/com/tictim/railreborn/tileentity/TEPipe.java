@@ -10,5 +10,4 @@ public class TEPipe extends TileEntity{
 		this.pipe = pipe;
 		return this;
 	}
-	
 }

@@ -1,6 +1,7 @@
 package com.tictim.railreborn.logic;
 
 import javax.annotation.Nullable;
+
 import com.tictim.railreborn.RailReborn;
 import com.tictim.railreborn.inventory.Inventory;
 import com.tictim.railreborn.inventory.InventoryBuilder;
@@ -27,7 +28,8 @@ import net.minecraftforge.items.wrapper.RangedWrapper;
 public class LogicBlastFurnace implements Logic<TileEntity>, InventoryBuilder, Machine, SidedItemHandlerFactory, AccessValidator{
 	private final Inventory inv = this.createInventory();
 	
-	private @Nullable Crafting crafting;
+	@Nullable
+	private Crafting crafting;
 	
 	@Override
 	public void update(){
@@ -39,7 +41,7 @@ public class LogicBlastFurnace implements Logic<TileEntity>, InventoryBuilder, M
 	
 	@Override
 	public void validate(TileEntity te, @Nullable TestResult multiblockTest){
-		if(multiblockTest!=null) for(BlockPos pos : multiblockTest.getGroup(1)){
+		if(multiblockTest!=null) for(BlockPos pos: multiblockTest.getGroup(1)){
 			TileEntity te2 = te.getWorld().getTileEntity(pos);
 			if(te2 instanceof TEMultibrickPart) ((TEMultibrickPart)te2).setCorePos(te.getPos());
 		}
@@ -140,7 +142,8 @@ public class LogicBlastFurnace implements Logic<TileEntity>, InventoryBuilder, M
 	}
 	
 	@Override
-	public @Nullable <T> T getCapability(Capability<T> cap, EnumFacing facing){
+	@Nullable
+	public <T> T getCapability(Capability<T> cap, EnumFacing facing){
 		if(cap==CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) return (T)this.inv.create(facing);
 		else return null;
 	}

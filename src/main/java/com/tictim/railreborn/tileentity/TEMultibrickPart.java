@@ -10,27 +10,30 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class TEMultibrickPart extends TileEntity{
-	private @Nullable BlockPos core;
+	@Nullable
+	private BlockPos core;
 	
 	public void setCorePos(@Nullable BlockPos pos){
 		this.core = pos;
 	}
 	
-	public @Nullable BlockPos getCorePos(){
+	@Nullable
+	public BlockPos getCorePos(){
 		return this.core;
 	}
 	
-	public @Nullable TEMultibrick getCore(){
+	@Nullable
+	public TEMultibrick getCore(){
 		if(this.core==null) return null;
 		TileEntity te = world.getTileEntity(core);
 		return te instanceof TEMultibrick ? (TEMultibrick)te : null;
 	}
-	
+	/*
 	@Override
 	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState){
 		return oldState.getBlock()!=newState.getBlock()||oldState.getValue(BlockMultibrickCore.PROPERTY)!=newState.getValue(BlockMultibrickCore.PROPERTY);
 	}
-	
+	*/
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt){
 		super.writeToNBT(nbt);

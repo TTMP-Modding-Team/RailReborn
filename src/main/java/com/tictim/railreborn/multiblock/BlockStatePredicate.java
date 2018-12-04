@@ -14,7 +14,7 @@ public class BlockStatePredicate extends BlockPredicate{
 	
 	public BlockStatePredicate(IBlockState state, boolean exact, boolean actual){
 		this.state = state;
-		this.exact = exact;
+		this.exact = exact|!state.getPropertyKeys().stream().anyMatch(k -> k.getName().equals("facing"));
 		this.actual = actual;
 	}
 	
@@ -30,5 +30,24 @@ public class BlockStatePredicate extends BlockPredicate{
 	@Override
 	public IBlockState example(){
 		return state;
+	}
+	/*
+	@Override
+	public boolean equals(Object obj){
+		if(obj==null) return false;
+		else if(obj==this) return true;
+		else if(obj instanceof BlockStatePredicate){
+			BlockStatePredicate p = (BlockStatePredicate)obj;
+			return this.actual==p.actual&&this.exact==p.exact&&(this.exact ? this.state==p.state : this.matches(p.state)&&p.matches(this.state));
+		}else return false;
+	}
+	*/
+	
+	@Override
+	public String toString(){
+		String s = "S:"+state;
+		if(exact) s += " exact";
+		if(actual) s += " actual";
+		return s;
 	}
 }

@@ -52,9 +52,7 @@ public enum PipeType{
 		/** blocks per second (m/s) */
 		private final double momentumThreshold;
 		
-		PipeIngr(
-				Material m, SoundType sound, boolean canCarryHotThing, boolean canCarryFluid, double lowPressureThreshold, double highPressureThreshold, double momentumThreshold
-		){
+		PipeIngr(Material m, SoundType sound, boolean canCarryHotThing, boolean canCarryFluid, double lowPressureThreshold, double highPressureThreshold, double momentumThreshold){
 			this.material = m;
 			this.sound = sound;
 			this.canCarryHotThing = canCarryHotThing;
