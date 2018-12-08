@@ -87,6 +87,7 @@ public class Blueprint{
 		return String.format("floors: {%s\n}, groups: {%s\n}, center: %s", floors.toString().replace("\n", "\n\t"), groups.toString().replace("\n", "\n\t"), posToStr(centerPos));
 	}
 	
+	// TODO Code organization
 	public static String posToStr(BlockPos pos){
 		return new StringBuilder().append("(").append(pos.getX()).append(" ").append(pos.getY()).append(" ").append(pos.getZ()).append(")").toString();
 	}

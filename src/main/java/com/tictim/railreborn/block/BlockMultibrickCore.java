@@ -18,7 +18,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -29,7 +28,6 @@ public class BlockMultibrickCore extends Block{
 		super(Material.ROCK);
 	}
 	
-	// TODO
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ){
 		if(!world.isRemote){
@@ -37,8 +35,7 @@ public class BlockMultibrickCore extends Block{
 			
 			if(te instanceof TEMultibrick){
 				TEMultibrick core = (TEMultibrick)te;
-				if(core.isLogicValid()) player.sendMessage(new TextComponentString("The Multibrick is valid!"));
-				else player.sendMessage(new TextComponentString("The Multibrick is NOT valid!"));
+				if(core.isLogicValid()) core.getMultibrick().getGui(true).openGui(player, world, pos);
 			}
 		}
 		return true;

@@ -1,15 +1,16 @@
 package com.tictim.railreborn.recipe;
 
-import javax.annotation.Nullable;
-
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.fluids.Fluid;
+
+import javax.annotation.Nullable;
 
 public class MachineRecipeImpl implements MachineRecipe{
 	private final Crafting c;
 	
 	public MachineRecipeImpl(Crafting c){
 		this.c = c;
+		expectValidKey();
 	}
 	
 	@Override
@@ -22,8 +23,23 @@ public class MachineRecipeImpl implements MachineRecipe{
 	@Override
 	@Nullable
 	public Crafting getCrafting(ItemStack input){
-		ItemStackHandler h = new ItemStackHandler(1);
-		h.setStackInSlot(0, input);
-		return c.extractInput(h, true) ? c : null;
+		return c.requiresLeastOne(input) ? new Crafting(c) : null;
+	}
+	
+	@Override
+	@Nullable
+	public Crafting getCrafting(Fluid fluid){
+		return c.requiresLeastOne(fluid) ? new Crafting(c) : null;
+	}
+	
+	@Nullable
+	@Override
+	public Crafting getCrafting(String key){
+		return key==null||!key.equals(c.getRecipeKey()) ? null : new Crafting(c);
+	}
+	
+	@Override
+	public String getKey(){
+		return c.getRecipeKey();
 	}
 }

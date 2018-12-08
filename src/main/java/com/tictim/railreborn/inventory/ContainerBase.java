@@ -1,22 +1,29 @@
 package com.tictim.railreborn.inventory;
 
-import javax.annotation.Nullable;
-
-import org.apache.commons.lang3.Validate;
+import com.google.common.base.MoreObjects;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.Validate;
+
+import javax.annotation.Nullable;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ContainerBase<TE extends TileEntity> extends Container{
 	protected final TE te;
 	protected final IInventory inv;
 	protected final EntityPlayer player;
 	
-	@Nullable
-	private TransferActionWrapper action;
+	private final List<TransferActionWrapper> actions = new LinkedList<>();
+	private final int[] fields;
 	
 	/**
 	 * @throws ClassCastException If {@code te} is not {@link IInventory} instance
@@ -29,6 +36,10 @@ public class ContainerBase<TE extends TileEntity> extends Container{
 		this.te = te;
 		this.inv = inv;
 		this.player = player;
+		this.fields = new int[inv.getFieldCount()];
+		for(int i = 0; i<fields.length; ++i){
+			fields[i] = inv.getField(i);
+		}
 	}
 	
 	protected void addPlayerInventory(int xOff, int yOff, boolean addTransferAction){
@@ -36,14 +47,13 @@ public class ContainerBase<TE extends TileEntity> extends Container{
 	}
 	
 	protected void addPlayerInventory(int xOff, int yOff, int quickslotYOff, boolean addTransferAction){
-		for(int i = 0; i<3; ++i){
-			for(int j = 0; j<9; ++j){
-				this.addSlotToContainer(new Slot(player.inventory, j+i*9+9, xOff+j*18, yOff+i*18));
+		for(int y = 0; y<3; y++){
+			for(int x = 0; x<9; x++){
+				this.addSlotToContainer(new Slot(player.inventory, x+y*9+9, xOff+x*18, yOff+y*18));
 			}
 		}
-		
-		for(int k = 0; k<9; ++k){
-			this.addSlotToContainer(new Slot(player.inventory, k, xOff*18, quickslotYOff));
+		for(int x = 0; x<9; x++){
+			this.addSlotToContainer(new Slot(player.inventory, x, xOff+x*18, quickslotYOff));
 		}
 		
 		if(addTransferAction) addPlayerInvTransferAction();
@@ -52,17 +62,9 @@ public class ContainerBase<TE extends TileEntity> extends Container{
 	protected void addPlayerInvTransferAction(){
 		int len = this.inventorySlots.size();
 		
-		addTransferAction(0, len-36, 36, (slot, idx, start, end) -> {
-			return this.mergeItemStack(slot.getStack(), 0, start, false);
-		});
-		
-		addTransferAction(-1, len-36, 27, (slot, idx, start, end) -> {
-			return this.mergeItemStack(slot.getStack(), end, end+9, false);
-		});
-		
-		addTransferAction(-2, len-9, 9, (slot, idx, start, end) -> {
-			return this.mergeItemStack(slot.getStack(), start-27, start, false);
-		});
+		addTransferAction(0, len-36, 36, (slot, idx, start, end) -> this.mergeItemStack(slot.getStack(), 0, start, false));
+		addTransferAction(-1, len-36, 27, (slot, idx, start, end) -> this.mergeItemStack(slot.getStack(), end, end+9, false));
+		addTransferAction(-2, len-9, 9, (slot, idx, start, end) -> this.mergeItemStack(slot.getStack(), start-27, start, false));
 	}
 	
 	protected void addDefaultTransferAction(int priority, int slotStart, int slots){
@@ -84,13 +86,8 @@ public class ContainerBase<TE extends TileEntity> extends Container{
 	}
 	
 	protected void addTransferAction(int priority, int slotStart, int slots, TransferAction action){
-		TransferActionWrapper w = new TransferActionWrapper(priority, slotStart, slots, action);
-		if(this.action==null){
-			this.action = w;
-		}else if(this.action.priority<priority){
-			w.setNext(this.action);
-			this.action = w;
-		}else this.action.setNext(w);
+		this.actions.add(new TransferActionWrapper(priority, slotStart, slots, action));
+		this.actions.sort(Comparator.naturalOrder());
 	}
 	
 	public TE getTE(){
@@ -107,7 +104,7 @@ public class ContainerBase<TE extends TileEntity> extends Container{
 	
 	@Override
 	public boolean canInteractWith(EntityPlayer player){
-		return inv.isUsableByPlayer(player);
+		return te.getWorld().getTileEntity(te.getPos())==te&&player.getDistanceSq(te.getPos().getX()+.5, te.getPos().getY()+.5, te.getPos().getZ()+.5)<=64&&inv.isUsableByPlayer(player);
 	}
 	
 	@Override
@@ -115,8 +112,8 @@ public class ContainerBase<TE extends TileEntity> extends Container{
 		Slot slot = this.inventorySlots.get(index);
 		if(slot!=null&&slot.getHasStack()&&slot.canTakeStack(player)){
 			ItemStack copy = slot.getStack().copy();
-			for(TransferActionWrapper w = action; action!=null; action = action.getNext()){
-				if(action.transfer(slot, index)){
+			for(TransferActionWrapper w: actions){
+				if(w.transfer(slot, index)){
 					ItemStack after = slot.getStack();
 					if(after.isEmpty()) slot.putStack(ItemStack.EMPTY);
 					else slot.onSlotChanged();
@@ -125,18 +122,43 @@ public class ContainerBase<TE extends TileEntity> extends Container{
 					slot.onTake(player, after);
 				}
 			}
-			return slot.getStack();
+			return ItemStack.EMPTY;
 		}else return ItemStack.EMPTY;
 	}
 	
+	public void addListener(IContainerListener listener){
+		super.addListener(listener);
+		listener.sendAllWindowProperties(this, this.inv);
+	}
+	
+	public void detectAndSendChanges(){
+		super.detectAndSendChanges();
+		
+		for(int i = 0; i<this.listeners.size(); i++){
+			IContainerListener l = this.listeners.get(i);
+			for(int j = 0; j<this.fields.length; j++){
+				int val = this.inv.getField(j);
+				if(val!=this.fields[j]){
+					this.fields[j] = val;
+					l.sendWindowProperty(this, j, val);
+				}
+			}
+		}
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public void updateProgressBar(int id, int data){
+		this.inv.setField(id, data);
+	}
+	
 	@FunctionalInterface
-	public static interface TransferAction<TE extends TileEntity>{
+	public static interface TransferAction{
 		boolean transfer(Slot slot, int index, int regionStart, int regionEnd);
 	}
 	
-	private class TransferActionWrapper{
+	private static class TransferActionWrapper implements Comparable<TransferActionWrapper>{
 		private final int priority, slotStart, slots;
-		private final TransferAction<TE> action;
+		private final TransferAction action;
 		
 		@Nullable
 		private TransferActionWrapper next;
@@ -166,31 +188,15 @@ public class ContainerBase<TE extends TileEntity> extends Container{
 			if(index >= slotStart&&index<slotStart+slots) return action.transfer(slot, index, slotStart, slotStart+slots);
 			else return false;
 		}
-	}
-	
-	/*
-	 * {@link #mergeItemStack(ItemStack, int, int, boolean)} but with simulate option
-	protected boolean merge(ItemStack stack, int startIndex, int endIndex, boolean reverseDirection, boolean simulate){
-		if(!simulate) return mergeItemStack(stack, startIndex, endIndex, reverseDirection);
 		
-		if(!stack.isEmpty()){
-			for(int i = reverseDirection ? endIndex-1 : startIndex; reverseDirection ? i<startIndex : i>=endIndex; i += reverseDirection ? -1 : 1){
-				Slot slot = this.inventorySlots.get(i);
-				ItemStack itemstack = slot.getStack();
-				if(!itemstack.isEmpty()){
-					if(stack.isStackable()){
-						int maxSize = Math.min(slot.getSlotStackLimit(), stack.getMaxStackSize());
-						if(itemstack.getCount()<maxSize&&stackable(itemstack, stack)) return true;
-					}
-				}else if(slot.isItemValid(stack)) return true;
-			}
+		@Override
+		public int compareTo(TransferActionWrapper o){
+			return o.priority-this.priority;
 		}
 		
-		return false;
+		@Override
+		public String toString(){
+			return MoreObjects.toStringHelper(this).add("priority", priority).add("slotStart", slotStart).add("slots", slots).toString();
+		}
 	}
-	
-	public static boolean stackable(ItemStack target, ItemStack object){
-		return target.getItem()==object.getItem()&&(!object.getHasSubtypes()||object.getMetadata()==target.getMetadata())&&ItemStack.areItemStackTagsEqual(object, target);
-	}
-	 */
 }

@@ -1,25 +1,44 @@
 package com.tictim.railreborn.recipe;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Nullable;
-
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.Fluid;
+
+import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MachineRecipeList implements MachineRecipe{
-	private final List<MachineRecipe> recipes = new ArrayList<>();
+	public static final Pattern RECIPE_KEY_PATTERN = Pattern.compile("^[a-zA-Z_-]+$");
+	
+	private final Map<String, MachineRecipe> recipes = new HashMap<>();
+	private final String key;
+	
+	public MachineRecipeList(String key){
+		this.key = key;
+		this.expectValidKey();
+	}
+	
+	@Override
+	public Pattern keyPattern(){
+		return RECIPE_KEY_PATTERN;
+	}
 	
 	public void addRecipe(MachineRecipe e){
-		recipes.add(e);
+		if(recipes.containsKey(e.getKey())){
+			throw new IllegalStateException("MachineRecipe named "+e.getKey()+" already exists");
+		}else{
+			recipes.put(e.getKey(), e);
+		}
 	}
 	
 	@Override
 	@Nullable
 	public Crafting getCrafting(Machine m){
-		for(int i = 0; i<recipes.size(); i++){
-			MachineRecipe e = recipes.get(i);
+		for(MachineRecipe e: recipes.values()){
 			Crafting c = e.getCrafting(m);
-			if(c!=null) return c;
+			if(c!=null) return c.setRecipeKey(key+"."+c.getRecipeKey());
 		}
 		return null;
 	}
@@ -27,11 +46,39 @@ public class MachineRecipeList implements MachineRecipe{
 	@Override
 	@Nullable
 	public Crafting getCrafting(ItemStack input){
-		for(int i = 0; i<recipes.size(); i++){
-			MachineRecipe e = recipes.get(i);
+		for(MachineRecipe e: recipes.values()){
 			Crafting c = e.getCrafting(input);
-			if(c!=null) return c;
+			if(c!=null) return c.setRecipeKey(key+"."+c.getRecipeKey());
 		}
 		return null;
+	}
+	
+	@Override
+	@Nullable
+	public Crafting getCrafting(Fluid fluid){
+		for(MachineRecipe e: recipes.values()){
+			Crafting c = e.getCrafting(fluid);
+			if(c!=null) return c.setRecipeKey(key+"."+c.getRecipeKey());
+		}
+		return null;
+	}
+	
+	@Nullable
+	@Override
+	public Crafting getCrafting(String key){
+		Matcher m = MachineRecipes.RECIPE_KEY_PATTERN.matcher(key);
+		if(m.matches()){
+			MachineRecipe e = recipes.get(m.group(1));
+			if(e!=null){
+				Crafting c = e.getCrafting(m.group(2));
+				if(c!=null) return c.setRecipeKey(this.key+"."+c.getRecipeKey());
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public String getKey(){
+		return this.key;
 	}
 }

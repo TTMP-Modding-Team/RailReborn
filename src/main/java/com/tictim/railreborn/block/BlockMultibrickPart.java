@@ -16,7 +16,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -25,7 +24,6 @@ public class BlockMultibrickPart extends BlockVar<Multibricks>{
 		super(Material.ROCK, SoundType.STONE);
 	}
 	
-	// TODO
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ){
 		TileEntity te = world.getTileEntity(pos);
@@ -33,7 +31,7 @@ public class BlockMultibrickPart extends BlockVar<Multibricks>{
 			TEMultibrickPart part = (TEMultibrickPart)te;
 			TEMultibrick core = part.getCore();
 			if(core!=null&&core.isLogicValid()){
-				player.sendMessage(new TextComponentString("The Multibrick is valid!"));
+				core.getMultibrick().getGui(false).openGui(player, world, pos);
 				return true;
 			}
 		}

@@ -1,19 +1,28 @@
 package com.tictim.railreborn.recipe;
 
-import java.util.Arrays;
-import javax.annotation.Nullable;
-
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.tictim.railreborn.RailReborn;
+import com.tictim.railreborn.capability.Debugable;
 import com.tictim.railreborn.item.IngredientStack;
+import com.tictim.railreborn.util.NBTTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ITickable;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public final class Crafting implements ITickable{
+import javax.annotation.Nullable;
+import java.util.Arrays;
+
+public final class Crafting implements ITickable, Debugable{
 	private final Machine handler;
 	
+	@Nullable
+	private String recipeKey;
 	@Nullable
 	private IngredientStack[] input;
 	@Nullable
@@ -21,7 +30,7 @@ public final class Crafting implements ITickable{
 	@Nullable
 	private FluidStack[] fluidInput, fluidOutput;
 	
-	private long totalTime, currentTime, timeIncrement = 1;
+	private int totalTime, currentTime, timeIncrement = 1;
 	
 	private int energy;
 	
@@ -31,7 +40,17 @@ public final class Crafting implements ITickable{
 		this.handler = handler;
 	}
 	
+	/**
+	 * It's just <code>new Crafting(c.handler).copy(c)</code>.
+	 * @param c
+	 */
+	public Crafting(Crafting c){
+		this(c.handler);
+		copy(c);
+	}
+	
 	public Crafting copy(Crafting c){
+		this.recipeKey = c.recipeKey;
 		this.input = copy(c.input);
 		this.output = copy(c.output);
 		this.fluidInput = copy(c.fluidInput);
@@ -45,7 +64,60 @@ public final class Crafting implements ITickable{
 	}
 	
 	public Crafting read(NBTTagCompound nbt){
+		this.recipeKey = nbt.getString("recipeKey");
+		Crafting c = MachineRecipes.INSTANCE.getCrafting(this.recipeKey);
+		if(c!=null) copy(c);
+		else RailReborn.LOGGER.warn("Couldn't find original recipe for Crafting '{}'", this.recipeKey);
+		this.output = nbt.hasKey("output", NBTTypes.LIST) ? toItemStackArray(nbt.getTagList("output", NBTTypes.COMPOUND)) : null;
+		//this.fluidInput = nbt.hasKey("fluidInput", NBTTypes.LIST) ? toFluidStackArray(nbt.getTagList("fluidInput", NBTTypes.COMPOUND)) : null;
+		this.fluidOutput = nbt.hasKey("fluidOutput", NBTTypes.LIST) ? toFluidStackArray(nbt.getTagList("fluidOutput", NBTTypes.COMPOUND)) : null;
+		this.totalTime = nbt.getInteger("totalTime");
+		this.currentTime = nbt.getInteger("currentTime");
+		this.timeIncrement = nbt.hasKey("timeIncrement", NBTTypes.INTEGER) ? nbt.getInteger("timeIncrement") : 1;
+		this.energy = nbt.getInteger("energy");
+		this.finalized = nbt.getBoolean("finalized");
 		return this;
+	}
+	
+	public NBTTagCompound serializeNBT(){
+		NBTTagCompound nbt = new NBTTagCompound();
+		nbt.setString("recipeKey", this.recipeKey);
+		if(output!=null){
+			NBTTagList list = new NBTTagList();
+			for(ItemStack s: output) list.appendTag(s.serializeNBT());
+			nbt.setTag("output", list);
+		}
+		if(fluidOutput!=null){
+			NBTTagList list = new NBTTagList();
+			for(FluidStack s: fluidOutput){
+				NBTTagCompound subnbt = new NBTTagCompound();
+				s.writeToNBT(subnbt);
+				list.appendTag(subnbt);
+			}
+			nbt.setTag("fluidOutput", list);
+		}
+		if(totalTime>0) nbt.setInteger("totalTime", totalTime);
+		if(currentTime>0) nbt.setInteger("currentTime", currentTime);
+		if(timeIncrement!=1) nbt.setInteger("timeIncrement", timeIncrement);
+		if(energy!=0) nbt.setInteger("energy", energy);
+		if(finalized) nbt.setBoolean("finalized", true);
+		return nbt;
+	}
+	
+	private static ItemStack[] toItemStackArray(NBTTagList list){
+		ItemStack[] arr = new ItemStack[list.tagCount()];
+		for(int i = 0; i<arr.length; i++){
+			arr[i] = new ItemStack(list.getCompoundTagAt(i));
+		}
+		return arr;
+	}
+	
+	private static FluidStack[] toFluidStackArray(NBTTagList list){
+		FluidStack[] arr = new FluidStack[list.tagCount()];
+		for(int i = 0; i<arr.length; i++){
+			arr[i] = FluidStack.loadFluidStackFromNBT(list.getCompoundTagAt(i));
+		}
+		return arr;
 	}
 	
 	@Nullable
@@ -82,7 +154,11 @@ public final class Crafting implements ITickable{
 	}
 	
 	public boolean isProcessDone(){
-		return totalTime>currentTime;
+		return totalTime >= currentTime;
+	}
+	
+	public double getProgress(){
+		return isProcessDone() ? 1 : (double)currentTime/totalTime;
 	}
 	
 	public boolean hasOutput(){
@@ -91,6 +167,15 @@ public final class Crafting implements ITickable{
 		if(fluidOutput!=null&&fluidOutput.length>0) for(FluidStack s: fluidOutput)
 			if(s.amount>0) return true;
 		return false;
+	}
+	
+	public Crafting setRecipeKey(String recipeKey){
+		this.recipeKey = recipeKey;
+		return this;
+	}
+	
+	public String getRecipeKey(){
+		return recipeKey;
 	}
 	
 	public Crafting setInput(IngredientStack... input){
@@ -129,22 +214,31 @@ public final class Crafting implements ITickable{
 		return fluidOutput;
 	}
 	
-	public Crafting setTotalTime(long totalTime){
+	public Crafting setTotalTime(int totalTime){
 		this.totalTime = totalTime;
 		return this;
 	}
 	
-	public Crafting setCurrentTime(long currentTime){
+	public Crafting setCurrentTime(int currentTime){
 		this.currentTime = currentTime;
 		return this;
 	}
 	
-	public long getTotalTime(){
+	public int getTotalTime(){
 		return this.totalTime;
 	}
 	
-	public long getCurrentTime(){
+	public int getCurrentTime(){
 		return this.currentTime;
+	}
+	
+	public Crafting setTimeIncrement(int timeIncrement){
+		this.timeIncrement = timeIncrement;
+		return this;
+	}
+	
+	public int getTimeIncrement(){
+		return timeIncrement;
 	}
 	
 	public Crafting setEnergy(int energy){
@@ -246,20 +340,41 @@ public final class Crafting implements ITickable{
 		return true;
 	}
 	
+	public boolean requiresLeastOne(ItemStack stack){
+		if(!stack.isEmpty()&&this.input!=null&&this.input.length>0) for(IngredientStack ing: input)
+			if(ing.getIngredient().test(stack)) return true;
+		return false;
+	}
+	
+	public boolean requiresLeastOne(Fluid fluid){
+		if(this.fluidInput!=null&&this.fluidInput.length>0) for(FluidStack s: fluidInput)
+			if(s.getFluid()==fluid) return true;
+		return false;
+	}
+	
 	private static void expect(@Nullable Object[] arr, int min, int max, String error){
 		int size = arr==null ? 0 : arr.length;
 		if(size<min||size>max) throw new IllegalStateException(String.format(error, size, min, max));
 	}
 	
-	public NBTTagCompound serializeNBT(){
-		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setLong("totalTime", totalTime);
-		nbt.setLong("currentTime", currentTime);
-		if(timeIncrement!=1) nbt.setLong("timeIncrement", timeIncrement);
-		return nbt;
+	@Override
+	public JsonElement getDebugInfo(){
+		JsonObject obj = new JsonObject();
+		obj.addProperty("Recipe Key", this.recipeKey);
+		if(this.input!=null) obj.add("Input", Debugable.debugInstances(this.input));
+		if(this.output!=null) obj.add("Output", Debugable.debugItemStacks(this.output));
+		if(this.fluidInput!=null) obj.add("Fluid Input", Debugable.debugFluidStacks(this.fluidInput));
+		if(this.fluidOutput!=null) obj.add("Fluid Output", Debugable.debugFluidStacks(this.fluidOutput));
+		if(this.energy!=0) obj.addProperty("'''Energy Thing'''", this.energy);
+		obj.addProperty("Total Ticks", this.totalTime);
+		obj.addProperty("Current Ticks", this.currentTime);
+		if(this.timeIncrement!=1) obj.addProperty("Tick Increment", this.timeIncrement);
+		return obj;
 	}
 	
 	public enum Step{
-		PROCESSING, WAITING_FOR_SPACE, DONE;
+		PROCESSING,
+		WAITING_FOR_SPACE,
+		DONE;
 	}
 }

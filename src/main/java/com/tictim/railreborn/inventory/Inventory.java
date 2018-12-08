@@ -1,15 +1,13 @@
 package com.tictim.railreborn.inventory;
 
-import java.util.EnumMap;
-import java.util.Map;
-import javax.annotation.Nullable;
-
-import com.tictim.railreborn.util.NBTTypes;
-import org.apache.commons.lang3.Validate;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.tictim.railreborn.capability.Debugable;
 import com.tictim.railreborn.inventory.InventoryBuilder.AccessValidator;
 import com.tictim.railreborn.inventory.InventoryBuilder.FieldHandler;
 import com.tictim.railreborn.inventory.InventoryBuilder.ItemHandlerFactory;
 import com.tictim.railreborn.inventory.InventoryBuilder.MarkDirtyListener;
+import com.tictim.railreborn.util.NBTTypes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
@@ -25,13 +23,18 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.InvWrapper;
+import org.apache.commons.lang3.Validate;
+
+import javax.annotation.Nullable;
+import java.util.EnumMap;
+import java.util.Map;
 
 /**
  * {@link InventoryBasic}보다 낫다
  * @author Tictim
  * @see InventoryBuilder
  */
-public abstract class Inventory implements IInventory, IItemHandlerModifiable, INBTSerializable<NBTTagCompound>{
+public abstract class Inventory implements IInventory, IItemHandlerModifiable, INBTSerializable<NBTTagCompound>, Debugable{
 	protected IItemHandler delegate = new InvWrapper(this);
 	protected final Name name = new Name();
 	protected int stackLimit = 64;
@@ -104,6 +107,11 @@ public abstract class Inventory implements IInventory, IItemHandlerModifiable, I
 	}
 	
 	@Override
+	public int getSlots(){
+		return this.getSizeInventory();
+	}
+	
+	@Override
 	public int getSlotLimit(int slot){
 		return this.stackLimit;
 	}
@@ -134,12 +142,12 @@ public abstract class Inventory implements IInventory, IItemHandlerModifiable, I
 	
 	@Override
 	public boolean isUsableByPlayer(EntityPlayer player){
-		return this.validator==null ? true : validator.isUsableByPlayer(player);
+		return this.validator==null||validator.isUsableByPlayer(player);
 	}
 	
 	@Override
 	public boolean isItemValidForSlot(int index, ItemStack stack){
-		return this.validator==null ? true : validator.isItemValidForSlot(index, stack);
+		return this.validator==null||validator.isItemValidForSlot(index, stack);
 	}
 	
 	@Override
@@ -168,6 +176,14 @@ public abstract class Inventory implements IInventory, IItemHandlerModifiable, I
 	@Override
 	public int getFieldCount(){
 		return field==null ? 0 : field.getFieldCount();
+	}
+	
+	@Override
+	public JsonElement getDebugInfo(){
+		JsonObject obj = new JsonObject();
+		obj.addProperty("Size", this.getSizeInventory());
+		obj.add("Items", Debugable.debugItemStacks(this));
+		return Debugable.stateClassType(this.getClass(), obj);
 	}
 	
 	@Override

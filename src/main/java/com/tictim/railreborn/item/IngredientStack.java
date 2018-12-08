@@ -1,13 +1,17 @@
 package com.tictim.railreborn.item;
 
-import org.apache.commons.lang3.Validate;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.tictim.railreborn.capability.Debugable;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraftforge.oredict.OreIngredient;
+import org.apache.commons.lang3.Validate;
 
-public final class IngredientStack{ /* implements Predicate<ItemStack>, com.google.common.base.Predicate<ItemStack> */
+public final class IngredientStack implements Debugable{
 	private final Ingredient ing;
 	private final int quantity;
 	
@@ -70,5 +74,18 @@ public final class IngredientStack{ /* implements Predicate<ItemStack>, com.goog
 	@Override
 	public String toString(){
 		return "["+ing+"] * "+quantity;
+	}
+	
+	@Override
+	public JsonElement getDebugInfo(){
+		JsonObject obj = new JsonObject();
+		JsonArray objIng = new JsonArray();
+		JsonObject objIngExamples = new JsonObject();
+		objIngExamples.add("Examples", Debugable.cutOff(Debugable.debugItemStacks(ing.getMatchingStacks()), 5));
+		objIng.add(ing.getClass().getSimpleName());
+		objIng.add(objIngExamples);
+		obj.add("Ingredient", objIng);
+		obj.addProperty("Quantity", quantity);
+		return obj;
 	}
 }

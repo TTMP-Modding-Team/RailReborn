@@ -1,6 +1,5 @@
 package com.tictim.railreborn.inventory;
 
-import com.tictim.railreborn.RailReborn;
 import com.tictim.railreborn.util.NBTTypes;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
@@ -21,11 +20,6 @@ public class InventoryFixed extends Inventory{
 	
 	public void reset(int length){
 		inv = NonNullList.withSize(length, ItemStack.EMPTY);
-	}
-	
-	@Override
-	public int getSlots(){
-		return inv.size();
 	}
 	
 	@Override
@@ -73,7 +67,7 @@ public class InventoryFixed extends Inventory{
 		for(int i = 0; i<this.inv.size(); i++){
 			ItemStack s = this.inv.get(i);
 			if(!s.isEmpty()){
-				NBTTagCompound subnbt = s.getTagCompound();
+				NBTTagCompound subnbt = s.serializeNBT();
 				subnbt.setInteger("_idx", i);
 				list.appendTag(subnbt);
 			}

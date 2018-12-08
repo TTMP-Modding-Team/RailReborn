@@ -1,12 +1,12 @@
 package com.tictim.railreborn.enums;
 
+import com.tictim.railreborn.RailRebornGui;
 import com.tictim.railreborn.logic.Logic;
 import com.tictim.railreborn.logic.LogicBlastFurnace;
 import com.tictim.railreborn.logic.LogicCokeOven;
 import com.tictim.railreborn.multiblock.Blueprint;
 import com.tictim.railreborn.multiblock.Blueprints;
 import com.tictim.railreborn.tileentity.TEMultibrick;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.MathHelper;
 
@@ -19,7 +19,7 @@ public enum Multibricks implements IStringSerializable{
 		return name().toLowerCase();
 	}
 	
-	public Logic<TileEntity> createLogic(){
+	public Logic<TEMultibrick> createLogic(){
 		switch(this){
 			case BLAST_FURNACE:
 				return new LogicBlastFurnace();
@@ -34,6 +34,15 @@ public enum Multibricks implements IStringSerializable{
 				return Blueprints.BLAST_FURNACE;
 			default: // case COKE_OVEN:
 				return Blueprints.COKE_OVEN;
+		}
+	}
+	
+	public RailRebornGui getGui(boolean core){
+		switch(this){
+			case BLAST_FURNACE:
+				return core ? RailRebornGui.BLAST_FURNACE : RailRebornGui.BLAST_FURNACE_FROM_PART;
+			default: // case COKE_OVEN:
+				return core ? RailRebornGui.COKE_OVEN : RailRebornGui.COKE_OVEN_FROM_PART;
 		}
 	}
 	

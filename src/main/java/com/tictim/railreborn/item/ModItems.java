@@ -7,6 +7,7 @@ import com.tictim.railreborn.enums.Misc;
 import com.tictim.railreborn.enums.Shape;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -38,9 +39,10 @@ public final class ModItems{
 	public static final ItemRefinedMetal STAINLESS_STEEL = (ItemRefinedMetal)new ItemRefinedMetal().setRegistryName("stainless_steel").setUnlocalizedName("railReborn.stainless_steel").setCreativeTab(TAB_ITEMS);
 	public static final ItemRefinedMetal CHROME = (ItemRefinedMetal)new ItemRefinedMetal().setShapes(Shape.INGOT, Shape.NUGGET, Shape.DUST).setRegistryName("chrome").setUnlocalizedName("railReborn.chrome").setCreativeTab(TAB_ITEMS);
 	
-	public static final Item CROWBAR_IRON = new ItemCrowbar(6, 400, "ingotIron").setRegistryName("crowbar_iron").setUnlocalizedName("crowbar_iron").setCreativeTab(TAB_ITEMS);
-	public static final Item CROWBAR_STEEL = new ItemCrowbar(9, 800, "ingotSteel").setRegistryName("crowbar_steel").setUnlocalizedName("crowbar_steel").setCreativeTab(TAB_ITEMS);
-	public static final Item CROWBAR_STAINLESS = new ItemCrowbar(8, 1200, Shape.INGOT.oreName(RailRebornCfg.getStainlessName())).setRegistryName("crowbar_stainless").setUnlocalizedName("crowbar_stainless").setCreativeTab(TAB_ITEMS);
+	public static final Item CROWBAR_IRON = new ItemCrowbar(6, 400, "ingotIron", EnumRarity.COMMON, EnumRarity.RARE).setRegistryName("crowbar_iron").setUnlocalizedName("crowbar_iron").setCreativeTab(TAB_ITEMS);
+	public static final Item CROWBAR_STEEL = new ItemCrowbar(9, 800, "ingotSteel", EnumRarity.UNCOMMON, EnumRarity.RARE).setRegistryName("crowbar_steel").setUnlocalizedName("crowbar_steel").setCreativeTab(TAB_ITEMS);
+	public static final Item CROWBAR_STAINLESS = new ItemCrowbar(8, 1200, Shape.INGOT.oreName(RailRebornCfg.getStainlessName()), EnumRarity.RARE, EnumRarity.EPIC).setRegistryName("crowbar_stainless").setUnlocalizedName("crowbar_stainless").setCreativeTab(TAB_ITEMS);
+	public static final Item CROWBAR_FOOL = new ItemFoolsCrowbar().setRegistryName("crowbar_fool").setUnlocalizedName("crowbar_fool").setCreativeTab(TAB_ITEMS);
 	
 	public static final Item COAL_COKE_BLOCK = new ItemBlock(ModBlocks.COAL_COKE_BLOCK).setRegistryName("coal_coke_block");
 	public static final Item ORE_TIN = new ItemBlock(ModBlocks.ORE_TIN).setRegistryName("ore_tin");
@@ -63,6 +65,7 @@ public final class ModItems{
 		registry.register(CROWBAR_IRON);
 		registry.register(CROWBAR_STEEL);
 		registry.register(CROWBAR_STAINLESS);
+		registry.register(CROWBAR_FOOL);
 		
 		registry.register(COAL_COKE_BLOCK);
 		registry.register(ORE_TIN);
@@ -106,17 +109,23 @@ public final class ModItems{
 		STAINLESS_STEEL.registerModels("stainless");
 		CHROME.registerModels("chrome");
 		
-		ModelLoader.setCustomModelResourceLocation(CROWBAR_IRON, 0, mrl(CROWBAR_IRON.getRegistryName()));
-		ModelLoader.setCustomModelResourceLocation(CROWBAR_STEEL, 0, mrl(CROWBAR_STEEL.getRegistryName()));
-		ModelLoader.setCustomModelResourceLocation(CROWBAR_STAINLESS, 0, mrl(CROWBAR_STAINLESS.getRegistryName()));
+		registerByDefault(CROWBAR_IRON);
+		registerByDefault(CROWBAR_STEEL);
+		registerByDefault(CROWBAR_STAINLESS);
+		registerByDefault(CROWBAR_FOOL);
 		
-		ModelLoader.setCustomModelResourceLocation(COAL_COKE_BLOCK, 0, mrl(COAL_COKE_BLOCK.getRegistryName()));
-		ModelLoader.setCustomModelResourceLocation(ORE_TIN, 0, mrl(ORE_TIN.getRegistryName()));
-		ModelLoader.setCustomModelResourceLocation(ORE_CHROME, 0, mrl(ORE_CHROME.getRegistryName()));
+		registerByDefault(COAL_COKE_BLOCK);
+		registerByDefault(ORE_TIN);
+		registerByDefault(ORE_CHROME);
 		METAL_BLOCKS.registerModels();
 		BRICKS.registerModels();
 		MULTIBRICK_CORE.registerModels();
 		MULTIBRICK_PART.registerModels();
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public static void registerByDefault(Item item){
+		ModelLoader.setCustomModelResourceLocation(item, 0, mrl(item.getRegistryName()));
 	}
 	
 	@SideOnly(Side.CLIENT)
