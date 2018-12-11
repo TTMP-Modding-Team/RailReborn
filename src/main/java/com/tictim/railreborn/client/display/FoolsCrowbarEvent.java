@@ -1,10 +1,7 @@
 package com.tictim.railreborn.client.display;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.tictim.railreborn.RailReborn;
+import com.tictim.railreborn.capability.Debugable;
 import com.tictim.railreborn.item.ModItems;
 import com.tictim.railreborn.network.MessageDebug;
 import net.minecraft.client.Minecraft;
@@ -13,7 +10,6 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -24,7 +20,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Mod.EventBusSubscriber(modid = RailReborn.MODID, value = Side.CLIENT)
@@ -91,44 +86,8 @@ public final class FoolsCrowbarEvent{
 		synchronized(display){
 			display.clear();
 			if(debug.e!=null){
-				display.addAll(Minecraft.getMinecraft().fontRenderer.listFormattedStringToWidth(getDebugString(debug.e), new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth()*2/5));
+				display.addAll(Minecraft.getMinecraft().fontRenderer.listFormattedStringToWidth(Debugable.toDebugString(debug.e), new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth()*2/5));
 			}
 		}
-	}
-	
-	private static String getDebugString(JsonElement data){
-		if(data.isJsonObject()){
-			JsonObject obj = data.getAsJsonObject();
-			StringBuilder stb = new StringBuilder();
-			boolean flag = true;
-			for(Map.Entry<String, JsonElement> e: obj.entrySet()){
-				if(flag) flag = false;
-				else stb.append("\n");
-				stb.append(e.getKey()).append(": ");
-				String s = getDebugString(e.getValue());
-				if(e.getValue().isJsonArray()||e.getValue().isJsonObject()) stb.append("\n  ");
-				stb.append(s.replace("\n", "\n  "));
-			}
-			return stb.toString();
-		}else if(data.isJsonArray()){
-			JsonArray arr = data.getAsJsonArray();
-			StringBuilder stb = new StringBuilder();
-			for(int i = 0; i<arr.size(); i++){
-				if(i>0) stb.append("\n");
-				stb.append(getDebugString(arr.get(i)));
-			}
-			return stb.toString();
-		}else if(data.isJsonPrimitive()){
-			JsonPrimitive p = data.getAsJsonPrimitive();
-			if(p.isNumber()){
-				return TextFormatting.GOLD+p.getAsString()+TextFormatting.RESET;
-			}else if(p.isBoolean()){
-				return (p.getAsBoolean() ? TextFormatting.GREEN+"True" : TextFormatting.RED+"False")+TextFormatting.RESET;
-			}else{
-				return p.getAsString()+TextFormatting.RESET;
-			}
-		}else if(data.isJsonNull()){
-			return TextFormatting.GRAY+"null"+TextFormatting.RESET;
-		}else throw new IllegalArgumentException("what the fuck are you "+data);
 	}
 }

@@ -66,11 +66,11 @@ public class MachineRecipeList implements MachineRecipe{
 	@Nullable
 	@Override
 	public Crafting getCrafting(String key){
-		Matcher m = MachineRecipes.RECIPE_KEY_PATTERN.matcher(key);
+		Matcher m = RECIPE_KEY_PATTERN.matcher(key);
 		if(m.matches()){
-			MachineRecipe e = recipes.get(m.group(1));
+			MachineRecipe e = recipes.get(key);
 			if(e!=null){
-				Crafting c = e.getCrafting(m.group(2));
+				Crafting c = e.getCrafting(key);
 				if(c!=null) return c.setRecipeKey(this.key+"."+c.getRecipeKey());
 			}
 		}

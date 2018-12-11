@@ -43,7 +43,7 @@ public class LogicBlastFurnace extends Logic<TEMultibrick> implements InventoryB
 	@Override
 	public void update(){
 		if(crafting!=null) crafting.update();
-		else if(!inv.getStackInSlot(0).isEmpty()&&!inv.getStackInSlot(1).isEmpty()){
+		else if(!inv.getStackInSlot(0).isEmpty()||!inv.getStackInSlot(1).isEmpty()){
 			crafting = MachineRecipes.BLAST_FURNACE.getCrafting(this);
 		}
 	}

@@ -2,6 +2,7 @@ package com.tictim.railreborn.capability;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
@@ -11,8 +12,10 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 
 public interface Debugable{
 	@CapabilityInject(Debugable.class)
@@ -87,12 +90,12 @@ public interface Debugable{
 	}
 	
 	static JsonPrimitive debugFluidStack(@Nullable FluidStack fluid){
-		return new JsonPrimitive(fluid==null||fluid.getFluid()==null||fluid.amount<=0 ? "Empty" : fluid.getFluid().getName()+" * "+TextFormatting.GOLD+fluid.amount);
+		return new JsonPrimitive(fluid==null||fluid.amount<=0 ? "Empty" : fluid.getFluid().getName()+" * "+TextFormatting.GOLD+fluid.amount);
 	}
 	
 	static JsonPrimitive debugFluidTank(IFluidTank tank){
 		FluidStack fluid = tank.getFluid();
-		boolean isEmpty = fluid==null||fluid.getFluid()==null||fluid.amount<=0;
+		boolean isEmpty = fluid==null||fluid.amount<=0;
 		String fluidStr = isEmpty ? "Empty" : fluid.getFluid().getName();
 		return new JsonPrimitive(fluidStr+" ( "+TextFormatting.GOLD+(isEmpty ? 0 : fluid.amount)+TextFormatting.RESET+" / "+TextFormatting.GOLD+tank.getCapacity()+TextFormatting.RESET+" )");
 	}
@@ -112,5 +115,50 @@ public interface Debugable{
 		arr.add(TextFormatting.BOLD+classOf.getSimpleName());
 		arr.add(e);
 		return arr;
+	}
+	
+	static String toDebugString(JsonElement data){
+		if(data.isJsonObject()){
+			JsonObject obj = data.getAsJsonObject();
+			StringBuilder stb = new StringBuilder();
+			boolean flag = true;
+			for(Map.Entry<String, JsonElement> e: obj.entrySet()){
+				if(flag) flag = false;
+				else stb.append("\n");
+				String key = e.getKey();
+				JsonElement value = e.getValue();
+				String s = toDebugString(e.getValue());
+				boolean insertBreak;
+				if(StringUtils.isBlank(key)){
+					stb.append(" ");
+					insertBreak = false;
+				}else{
+					stb.append(e.getKey()).append(": ");
+					insertBreak = (value.isJsonArray()&&value.getAsJsonArray().size()>1)||value.isJsonObject();
+				}
+				if(insertBreak) stb.append("\n  ");
+				stb.append(s.replace("\n", "\n  "));
+			}
+			return stb.toString();
+		}else if(data.isJsonArray()){
+			JsonArray arr = data.getAsJsonArray();
+			StringBuilder stb = new StringBuilder();
+			for(int i = 0; i<arr.size(); i++){
+				if(i>0) stb.append("\n");
+				stb.append(toDebugString(arr.get(i)));
+			}
+			return stb.toString();
+		}else if(data.isJsonPrimitive()){
+			JsonPrimitive p = data.getAsJsonPrimitive();
+			if(p.isNumber()){
+				return TextFormatting.GOLD+p.getAsString()+TextFormatting.RESET;
+			}else if(p.isBoolean()){
+				return (p.getAsBoolean() ? TextFormatting.GREEN+"True" : TextFormatting.RED+"False")+TextFormatting.RESET;
+			}else{
+				return p.getAsString()+TextFormatting.RESET;
+			}
+		}else if(data.isJsonNull()){
+			return TextFormatting.GRAY+"null"+TextFormatting.RESET;
+		}else throw new IllegalArgumentException("what the fuck are you "+data);
 	}
 }

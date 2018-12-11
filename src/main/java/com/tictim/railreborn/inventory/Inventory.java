@@ -52,19 +52,25 @@ public abstract class Inventory implements IInventory, IItemHandlerModifiable, I
 	@Nullable
 	private ItemHandlerFactory ihfactory;
 	@Nullable
+	private IItemHandler nullSideHandler;
+	@Nullable
 	private Map<EnumFacing, IItemHandler> cache;
 	
 	public void setItemHandlerFactory(@Nullable ItemHandlerFactory ihfactory){
 		if(this.ihfactory!=ihfactory){
 			this.ihfactory = ihfactory;
-			delegate = ihfactory==null ? new InvWrapper(this) : ihfactory.create(this, null);
+			//delegate = ihfactory==null ? new InvWrapper(this) : ihfactory.create(this, null);
 			cache = null;
 		}
 	}
 	
 	public IItemHandler create(@Nullable EnumFacing facing){
-		if(ihfactory==null||facing==null) return delegate;
-		else if(cache!=null){
+		if(ihfactory==null) return delegate;
+		
+		if(facing==null){
+			if(nullSideHandler==null) nullSideHandler = ihfactory.create(this, null);
+			return nullSideHandler;
+		}else if(cache!=null){
 			if(cache.containsKey(facing)) return cache.get(facing);
 		}else cache = new EnumMap<>(EnumFacing.class);
 		IItemHandler i = ihfactory.create(this, facing);

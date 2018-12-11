@@ -133,7 +133,7 @@ public final class Crafting implements ITickable, Debugable{
 		else if(handler.interact(this)){
 			if(s==Step.PROCESSING){
 				if(handler.process(this)){
-					currentTime = Math.max(0, currentTime-timeIncrement);
+					currentTime += timeIncrement;
 					if(!isProcessDone()) return;
 				}
 			}
@@ -150,11 +150,11 @@ public final class Crafting implements ITickable, Debugable{
 	}
 	
 	public Step getStep(){
-		return isProcessDone() ? Step.PROCESSING : hasOutput() ? Step.WAITING_FOR_SPACE : Step.DONE;
+		return isProcessDone() ? (hasOutput() ? Step.WAITING_FOR_SPACE : Step.DONE) : Step.PROCESSING;
 	}
 	
 	public boolean isProcessDone(){
-		return totalTime >= currentTime;
+		return totalTime<=currentTime;
 	}
 	
 	public double getProgress(){
@@ -289,16 +289,32 @@ public final class Crafting implements ITickable, Debugable{
 	
 	public boolean extractInput(IItemHandler handler, boolean simulate){
 		if(this.input!=null&&this.input.length>0){
-			for(IngredientStack ing: input){
-				int quantity = ing.getQuantity();
-				for(int i = 0, j = handler.getSlots(); i<j; i++){
-					ItemStack s = handler.extractItem(i, 64, simulate);
-					if(!s.isEmpty()&&ing.getIngredient().test(s)){
-						quantity -= s.getCount();
-						if(quantity<=0) break;
-					}
+			int[] quantities = new int[this.input.length];
+			int[] consumed = new int[handler.getSlots()];
+			
+			for(int i = 0; i<consumed.length; i++){
+				ItemStack s = handler.extractItem(i, 64, true);
+				if(s.isEmpty()) continue;
+				int stackLeft = s.getCount();
+				
+				for(int j = 0; j<input.length; j++){
+					IngredientStack ing = input[j];
+					if(ing.getQuantity()>quantities[j]){
+						int valLeft = Math.min(stackLeft, ing.getQuantity()-quantities[j]);
+						if(ing.getIngredient().test(s)){
+							quantities[j] += valLeft;
+							stackLeft -= valLeft;
+							consumed[i] += valLeft;
+							if(stackLeft<=0) break;
+						}
+					}else break;
 				}
-				if(quantity>0) return false;
+			}
+			for(int i = 0; i<quantities.length; i++){
+				if(input[i].getQuantity()<quantities[i]) return false;
+			}
+			if(!simulate) for(int i = 0; i<consumed.length; i++){
+				if(consumed[i]>0) handler.extractItem(i, consumed[i], false);
 			}
 		}
 		return true;
@@ -306,11 +322,13 @@ public final class Crafting implements ITickable, Debugable{
 	
 	public boolean insertOutput(IItemHandler handler, boolean simulate){
 		if(this.output!=null&&this.output.length>0){
-			for(ItemStack s: output){
-				for(int i = 0, j = handler.getSlots(); i<j; i++){
-					s = handler.insertItem(i, s, simulate);
+			for(int i = 0; i<this.output.length; i++){
+				ItemStack s = this.output[i].copy();
+				for(int j = 0, j0 = handler.getSlots(); j<j0; j++){
+					s = handler.insertItem(j, s, simulate);
 					if(s.isEmpty()) break;
 				}
+				if(!simulate) this.output[i] = s;
 				if(!s.isEmpty()) return false;
 			}
 		}
@@ -320,9 +338,12 @@ public final class Crafting implements ITickable, Debugable{
 	
 	public boolean extractFluidInput(IFluidHandler handler, boolean simulate){
 		if(this.fluidInput!=null&&this.fluidInput.length>0){
-			for(FluidStack s: fluidInput){
-				FluidStack s2 = handler.drain(s, !simulate);
-				if(s.amount>s2.amount) return false;
+			for(int i = 0; i<this.fluidInput.length; i++){
+				FluidStack s = this.fluidInput[i];
+				if(s.amount>0){
+					FluidStack s2 = handler.drain(s, !simulate);
+					if(s.amount>s2.amount) return false;
+				}
 			}
 		}
 		return true;
@@ -330,13 +351,16 @@ public final class Crafting implements ITickable, Debugable{
 	
 	public boolean insertFluidOutput(IFluidHandler handler, boolean simulate){
 		if(this.fluidOutput!=null&&this.fluidOutput.length>0){
-			for(FluidStack s: fluidOutput){
-				s = s.copy();
-				s.amount = s.amount-handler.fill(s, !simulate);
-				if(s.amount>0) return false;
+			for(int i = 0; i<this.fluidOutput.length; i++){
+				FluidStack s = this.fluidOutput[i];
+				if(s.amount>0){
+					int amount = handler.fill(s, !simulate);
+					if(!simulate&&amount>0) (this.fluidOutput[i] = s.copy()).amount -= amount;
+					if(s.amount>amount) return false;
+				}
 			}
+			if(!simulate) this.fluidOutput = null;
 		}
-		if(!simulate) this.fluidOutput = null;
 		return true;
 	}
 	
@@ -370,6 +394,11 @@ public final class Crafting implements ITickable, Debugable{
 		obj.addProperty("Current Ticks", this.currentTime);
 		if(this.timeIncrement!=1) obj.addProperty("Tick Increment", this.timeIncrement);
 		return obj;
+	}
+	
+	@Override
+	public String toString(){
+		return Debugable.toDebugString(getDebugInfo());
 	}
 	
 	public enum Step{

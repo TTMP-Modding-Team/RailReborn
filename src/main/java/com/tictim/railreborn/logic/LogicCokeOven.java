@@ -28,9 +28,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.RangedWrapper;
@@ -44,7 +46,7 @@ public class LogicCokeOven extends Logic<TEMultibrick> implements InventoryBuild
 	private Crafting crafting;
 	
 	{
-		tank.setCanFill(false);
+		resetTank();
 	}
 	
 	@Override
@@ -61,7 +63,7 @@ public class LogicCokeOven extends Logic<TEMultibrick> implements InventoryBuild
 			TileEntity te2 = te.getWorld().getTileEntity(pos);
 			if(te2 instanceof TEMultibrickPart) ((TEMultibrickPart)te2).setCorePos(te.getPos());
 		}
-		tank.setCanDrain(true);
+		resetTank();
 	}
 	
 	@Override
@@ -75,7 +77,7 @@ public class LogicCokeOven extends Logic<TEMultibrick> implements InventoryBuild
 			crafting = null;
 		}
 		InventoryHelper.dropInventoryItems(te.getWorld(), te.getPos(), inv);
-		tank.setCanDrain(false);
+		resetTank();
 	}
 	
 	@Override
@@ -99,6 +101,12 @@ public class LogicCokeOven extends Logic<TEMultibrick> implements InventoryBuild
 		if(nbt.hasKey("inventory", NBTTypes.COMPOUND)) inv.deserializeNBT(nbt.getCompoundTag("inventory"));
 		if(nbt.hasKey("fluidTank", NBTTypes.COMPOUND)) tank.readFromNBT(nbt.getCompoundTag("fluidTank"));
 		crafting = nbt.hasKey("crafting", NBTTypes.COMPOUND) ? new Crafting(this).read(nbt.getCompoundTag("crafting")) : null;
+		resetTank();
+	}
+	
+	private void resetTank(){
+		tank.setCanFill(valid);
+		tank.setCanDrain(valid);
 	}
 	
 	@Override
@@ -194,9 +202,9 @@ public class LogicCokeOven extends Logic<TEMultibrick> implements InventoryBuild
 	public int getField(int id){
 		switch(id){
 			case 0:
-				return this.crafting==null ? 0 : (int)this.crafting.getCurrentTime();
+				return this.crafting==null ? 0 : this.crafting.getCurrentTime();
 			case 1:
-				return this.crafting==null ? 0 : (int)this.crafting.getTotalTime();
+				return this.crafting==null ? 0 : this.crafting.getTotalTime();
 			default:
 				throw new IllegalArgumentException("id: "+id);
 		}
@@ -243,11 +251,39 @@ public class LogicCokeOven extends Logic<TEMultibrick> implements InventoryBuild
 		else return super.hasCapability(cap, facing);
 	}
 	
+	@Nullable
+	private IFluidHandler tankCapability;
+	
 	@Override
 	@Nullable
+	@SuppressWarnings("unchecked")
 	public <T> T getCapability(Capability<T> cap, EnumFacing facing){
-		if(cap==CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) return (T)this.inv.create(facing);
-		else if(cap==CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) return (T)this.tank;
-		else return super.getCapability(cap, facing);
+		if(cap==CapabilityItemHandler.ITEM_HANDLER_CAPABILITY){
+			return (T)this.inv.create(facing);
+		}else if(cap==CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY){
+			if(tankCapability==null){
+				tankCapability = new IFluidHandler(){
+					@Override
+					public IFluidTankProperties[] getTankProperties(){
+						return tank.getTankProperties();
+					}
+					@Override
+					public int fill(FluidStack resource, boolean doFill){
+						return 0;
+					}
+					@Nullable
+					@Override
+					public FluidStack drain(FluidStack resource, boolean doDrain){
+						return tank.drain(resource, doDrain);
+					}
+					@Nullable
+					@Override
+					public FluidStack drain(int maxDrain, boolean doDrain){
+						return tank.drain(maxDrain, doDrain);
+					}
+				};
+			}
+			return (T)tankCapability;
+		}else return super.getCapability(cap, facing);
 	}
 }

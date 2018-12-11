@@ -81,7 +81,7 @@ public final class IngredientStack implements Debugable{
 		JsonObject obj = new JsonObject();
 		JsonArray objIng = new JsonArray();
 		JsonObject objIngExamples = new JsonObject();
-		objIngExamples.add("Examples", Debugable.cutOff(Debugable.debugItemStacks(ing.getMatchingStacks()), 5));
+		objIngExamples.add("", Debugable.cutOff(Debugable.debugItemStacks(ing.getMatchingStacks()), 5));
 		objIng.add(ing.getClass().getSimpleName());
 		objIng.add(objIngExamples);
 		obj.add("Ingredient", objIng);

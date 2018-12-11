@@ -61,6 +61,19 @@ public class TEMultibrickPart extends TileEntity implements Debugable{
 		}else this.core = null;
 	}
 	
+	@Override
+	public NBTTagCompound getUpdateTag(){
+		NBTTagCompound nbt = super.getUpdateTag();
+		if(core!=null){
+			NBTTagCompound subnbt = new NBTTagCompound();
+			subnbt.setInteger("x", core.getX());
+			subnbt.setInteger("y", core.getY());
+			subnbt.setInteger("z", core.getZ());
+			nbt.setTag("core", subnbt);
+		}
+		return nbt;
+	}
+	
 	@Nullable
 	@Override
 	public SPacketUpdateTileEntity getUpdatePacket(){
@@ -73,7 +86,7 @@ public class TEMultibrickPart extends TileEntity implements Debugable{
 		obj.add("Multibrick Core Position", core==null ? JsonNull.INSTANCE : new JsonPrimitive(Blueprint.posToStr(core)));
 		if(core!=null){
 			TEMultibrick core = getCore();
-			obj.add("Multibrick Core", core==null ? JsonNull.INSTANCE : core.getDebugInfo());
+			obj.add("", core==null ? JsonNull.INSTANCE : core.getDebugInfo());
 		}
 		return Debugable.stateClassType(this.getClass(), obj);
 	}

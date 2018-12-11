@@ -16,8 +16,9 @@ public class MachineRecipeImpl implements MachineRecipe{
 	@Override
 	@Nullable
 	public Crafting getCrafting(Machine machine){
-		if(!(c.extractInput(machine.inputSlotHandler(), true)&&c.extractFluidInput(machine.inputFluidHandler(), true)&&c.insertOutput(machine.outputSlotHandler(), true)&&c.insertFluidOutput(machine.outputFluidHandler(), true))) return null;
-		return new Crafting(machine).copy(c);
+		if(c.extractInput(machine.inputSlotHandler(), true)&&c.extractFluidInput(machine.inputFluidHandler(), true)&&c.insertOutput(machine.outputSlotHandler(), true)&&c.insertFluidOutput(machine.outputFluidHandler(), true)){
+			return new Crafting(machine).copy(c);
+		}else return null;
 	}
 	
 	@Override
