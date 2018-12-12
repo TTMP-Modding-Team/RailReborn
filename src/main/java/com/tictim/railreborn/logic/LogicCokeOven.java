@@ -15,7 +15,6 @@ import com.tictim.railreborn.multiblock.Blueprint.TestResult;
 import com.tictim.railreborn.recipe.Crafting;
 import com.tictim.railreborn.recipe.Machine;
 import com.tictim.railreborn.recipe.MachineRecipes;
-import com.tictim.railreborn.tileentity.TEMultibrick;
 import com.tictim.railreborn.tileentity.TEMultibrickPart;
 import com.tictim.railreborn.util.NBTTypes;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -39,7 +38,7 @@ import net.minecraftforge.items.wrapper.RangedWrapper;
 
 import javax.annotation.Nullable;
 
-public class LogicCokeOven extends Logic<TEMultibrick> implements InventoryBuilder, Machine, SidedItemHandlerFactory, AccessValidator, FieldHandler{
+public class LogicCokeOven extends Logic implements InventoryBuilder, Machine, SidedItemHandlerFactory, AccessValidator, FieldHandler{
 	private final Inventory inv = this.createInventory();
 	private final FluidTank tank = new FluidTank(16000);
 	@Nullable
@@ -58,7 +57,7 @@ public class LogicCokeOven extends Logic<TEMultibrick> implements InventoryBuild
 	}
 	
 	@Override
-	protected void onValidate(TEMultibrick te, @Nullable TestResult multiblockTest){
+	protected void onValidate(TileEntity te, @Nullable TestResult multiblockTest){
 		if(multiblockTest!=null) for(BlockPos pos: multiblockTest.getGroup(1)){
 			TileEntity te2 = te.getWorld().getTileEntity(pos);
 			if(te2 instanceof TEMultibrickPart) ((TEMultibrickPart)te2).setCorePos(te.getPos());
@@ -67,7 +66,7 @@ public class LogicCokeOven extends Logic<TEMultibrick> implements InventoryBuild
 	}
 	
 	@Override
-	protected void onInvalidate(TEMultibrick te, @Nullable TestResult multiblockTest){
+	protected void onInvalidate(TileEntity te, @Nullable TestResult multiblockTest){
 		if(multiblockTest!=null) for(BlockPos pos: multiblockTest.getGroup(1)){
 			TileEntity te2 = te.getWorld().getTileEntity(pos);
 			if(te2 instanceof TEMultibrickPart) ((TEMultibrickPart)te2).setCorePos(null);
@@ -178,12 +177,12 @@ public class LogicCokeOven extends Logic<TEMultibrick> implements InventoryBuild
 	}
 	
 	@Override
-	public ContainerCokeOven getContainer(TEMultibrick te, EntityPlayer player){
-		return new ContainerCokeOven(te, this.inv, player);
+	public ContainerCokeOven getContainer(TileEntity te, EntityPlayer player){
+		return new ContainerCokeOven(te, this, this.inv, player);
 	}
 	
 	@Override
-	public GuiContainer getGui(TEMultibrick te, EntityPlayer player){
+	public GuiContainer getGui(TileEntity te, EntityPlayer player){
 		return new GuiCokeOven(getContainer(te, player));
 	}
 	

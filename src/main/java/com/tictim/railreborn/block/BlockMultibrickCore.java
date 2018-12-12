@@ -46,7 +46,7 @@ public class BlockMultibrickCore extends Block{
 		TileEntity te = world.getTileEntity(pos);
 		if(te instanceof TEMultibrick){
 			TEMultibrick core = (TEMultibrick)te;
-			core.onBreak();
+			core.invalidateLogic();
 		}
 		world.removeTileEntity(pos);
 	}

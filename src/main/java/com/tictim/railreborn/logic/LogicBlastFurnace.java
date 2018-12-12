@@ -15,7 +15,6 @@ import com.tictim.railreborn.multiblock.Blueprint.TestResult;
 import com.tictim.railreborn.recipe.Crafting;
 import com.tictim.railreborn.recipe.Machine;
 import com.tictim.railreborn.recipe.MachineRecipes;
-import com.tictim.railreborn.tileentity.TEMultibrick;
 import com.tictim.railreborn.tileentity.TEMultibrickPart;
 import com.tictim.railreborn.util.NBTTypes;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -34,7 +33,7 @@ import net.minecraftforge.items.wrapper.RangedWrapper;
 
 import javax.annotation.Nullable;
 
-public class LogicBlastFurnace extends Logic<TEMultibrick> implements InventoryBuilder, Machine, SidedItemHandlerFactory, AccessValidator, FieldHandler{
+public class LogicBlastFurnace extends Logic implements InventoryBuilder, Machine, SidedItemHandlerFactory, AccessValidator, FieldHandler{
 	private final Inventory inv = this.createInventory();
 	
 	@Nullable
@@ -49,7 +48,7 @@ public class LogicBlastFurnace extends Logic<TEMultibrick> implements InventoryB
 	}
 	
 	@Override
-	protected void onValidate(TEMultibrick te, @Nullable TestResult multiblockTest){
+	protected void onValidate(TileEntity te, @Nullable TestResult multiblockTest){
 		if(multiblockTest!=null) for(BlockPos pos: multiblockTest.getGroup(1)){
 			TileEntity te2 = te.getWorld().getTileEntity(pos);
 			if(te2 instanceof TEMultibrickPart) ((TEMultibrickPart)te2).setCorePos(te.getPos());
@@ -57,7 +56,7 @@ public class LogicBlastFurnace extends Logic<TEMultibrick> implements InventoryB
 	}
 	
 	@Override
-	protected void onInvalidate(TEMultibrick te, @Nullable TestResult multiblockTest){
+	protected void onInvalidate(TileEntity te, @Nullable TestResult multiblockTest){
 		if(crafting!=null){
 			crafting.cancel();
 			crafting = null;
@@ -146,12 +145,12 @@ public class LogicBlastFurnace extends Logic<TEMultibrick> implements InventoryB
 	}
 	
 	@Override
-	public ContainerBlastFurnace getContainer(TEMultibrick te, EntityPlayer player){
-		return new ContainerBlastFurnace(te, this.inv, player);
+	public ContainerBlastFurnace getContainer(TileEntity te, EntityPlayer player){
+		return new ContainerBlastFurnace(te, this, this.inv, player);
 	}
 	
 	@Override
-	public GuiContainer getGui(TEMultibrick te, EntityPlayer player){
+	public GuiContainer getGui(TileEntity te, EntityPlayer player){
 		return new GuiBlastFurnace(getContainer(te, player));
 	}
 	

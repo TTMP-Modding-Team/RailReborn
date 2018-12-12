@@ -2,6 +2,7 @@ package com.tictim.railreborn.client.gui;
 
 import com.tictim.railreborn.RailReborn;
 import com.tictim.railreborn.inventory.ContainerCokeOven;
+import com.tictim.railreborn.recipe.Crafting;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.util.ResourceLocation;
 
@@ -29,7 +30,7 @@ public class GuiCokeOven extends GuiContainer{
 	
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY){
-		String s = container.getTE().getDisplayName().getFormattedText();
+		String s = container.getIInventory().getDisplayName().getFormattedText();
 		this.fontRenderer.drawString(s, this.xSize/2-this.fontRenderer.getStringWidth(s)/2, -11, 0xFFFFFF);
 	}
 	
@@ -37,7 +38,10 @@ public class GuiCokeOven extends GuiContainer{
 	protected void drawGuiContainerBackgroundLayer(float v, int i, int i1){
 		this.mc.getTextureManager().bindTexture(TEXTURE);
 		this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
-		double p = container.getTE().getProgress();
-		if(p>0) this.drawTexturedModalRect(this.guiLeft+53, this.guiTop+27, this.xSize, 0, (int)(26*p), 13);
+		Crafting c = container.getLogic().getCrafting(0);
+		if(c!=null){
+			double p = c.getProgress();
+			if(p>0) this.drawTexturedModalRect(this.guiLeft+53, this.guiTop+27, this.xSize, 0, (int)(26*p), 13);
+		}
 	}
 }

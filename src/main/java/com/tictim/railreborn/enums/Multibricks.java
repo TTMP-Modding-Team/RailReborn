@@ -6,7 +6,6 @@ import com.tictim.railreborn.logic.LogicBlastFurnace;
 import com.tictim.railreborn.logic.LogicCokeOven;
 import com.tictim.railreborn.multiblock.Blueprint;
 import com.tictim.railreborn.multiblock.Blueprints;
-import com.tictim.railreborn.tileentity.TEMultibrick;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.MathHelper;
 
@@ -19,7 +18,7 @@ public enum Multibricks implements IStringSerializable{
 		return name().toLowerCase();
 	}
 	
-	public Logic<TEMultibrick> createLogic(){
+	public Logic createLogic(){
 		switch(this){
 			case BLAST_FURNACE:
 				return new LogicBlastFurnace();
