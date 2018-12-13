@@ -6,7 +6,6 @@ import com.tictim.railreborn.client.tesr.TESRMultiblockDebug.MultiblockDebugable
 import com.tictim.railreborn.enums.Multibricks;
 import com.tictim.railreborn.logic.Logic;
 import com.tictim.railreborn.multiblock.Blueprint.TestResult;
-import com.tictim.railreborn.recipe.Crafting;
 import com.tictim.railreborn.util.NBTTypes;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.inventory.GuiContainer;

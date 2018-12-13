@@ -77,39 +77,45 @@ public enum MachineRecipes implements MachineRecipe{
 		return null;
 	}
 	
+	// even though this is useless...
+	@Override
+	public void expectCrafting(RecipeExpect expect){
+		for(MachineRecipe recipe: this.recipes.values()) recipe.expectCrafting(expect);
+	}
+	
 	@Override
 	public String getKey(){
 		return "";
 	}
 	
-	public static final MachineRecipeList COKE_OVEN = new MachineRecipeList("coke_oven");
-	public static final MachineRecipeList BLAST_FURNACE = new MachineRecipeList("blast_furnace");
+	public static final MachineRecipeList COKE_OVEN = new MachineRecipeList("coke_oven", new RecipeExpect().setInputSize(1).setOutputSize(1).setFluidInputSize(0).setFluidOutputSize(0, 1));
+	public static final MachineRecipeList BLAST_FURNACE = new MachineRecipeList("blast_furnace", new RecipeExpect().setInputSize(1, 1).setOutputSize(1).setFluidInputSize(0).setFluidOutputSize(0));
 	
 	public static void addMachineRecipes(){
 		INSTANCE.addRecipe(COKE_OVEN);
 		INSTANCE.addRecipe(BLAST_FURNACE);
 		
-		COKE_OVEN.addRecipe(new CokeOvenRecipe(new Crafting(DummyCraftingHandler.INSTANCE).setRecipeKey("coke")//
+		COKE_OVEN.addRecipe(new SimpleMachineRecipe(new Crafting(DummyCraftingHandler.INSTANCE).setRecipeKey("coke")//
 				.setInput(new IngredientStack(new ItemStack(Items.COAL)))//
 				.setOutput(Misc.COKE.of())//
 				.setFluidOutput(new FluidStack(ModFluids.CREOSOTE_OIL, 500))//
 				.setTotalTime(3000)));
-		COKE_OVEN.addRecipe(new CokeOvenRecipe(new Crafting(DummyCraftingHandler.INSTANCE).setRecipeKey("coke_block")//
+		COKE_OVEN.addRecipe(new SimpleMachineRecipe(new Crafting(DummyCraftingHandler.INSTANCE).setRecipeKey("coke_block")//
 				.setInput(new IngredientStack("blockCoal"))//
 				.setOutput(new ItemStack(ModItems.COAL_COKE_BLOCK))//
 				.setFluidOutput(new FluidStack(ModFluids.CREOSOTE_OIL, 4500))//
 				.setTotalTime(27000)));
-		COKE_OVEN.addRecipe(new CokeOvenRecipe(new Crafting(DummyCraftingHandler.INSTANCE).setRecipeKey("charcoal")//
+		COKE_OVEN.addRecipe(new SimpleMachineRecipe(new Crafting(DummyCraftingHandler.INSTANCE).setRecipeKey("charcoal")//
 				.setInput(new IngredientStack("logWood"))//
 				.setOutput(new ItemStack(Items.COAL, 1, 1))//
 				.setFluidOutput(new FluidStack(ModFluids.CREOSOTE_OIL, 500))//
 				.setTotalTime(3000)));
 		
-		BLAST_FURNACE.addRecipe(new BlastFurnaceRecipe(new Crafting(DummyCraftingHandler.INSTANCE).setRecipeKey("steel_coal")//
+		BLAST_FURNACE.addRecipe(new SimpleMachineRecipe(new Crafting(DummyCraftingHandler.INSTANCE).setRecipeKey("steel_coal")//
 				.setInput(new IngredientStack("ingotIron"), new IngredientStack(new ItemStack(Items.COAL, 4, OreDictionary.WILDCARD_VALUE)))//
 				.setOutput(ModItems.STEEL.of(Shape.INGOT))//
 				.setTotalTime(2560)));
-		BLAST_FURNACE.addRecipe(new BlastFurnaceRecipe(new Crafting(DummyCraftingHandler.INSTANCE).setRecipeKey("steel_coke")//
+		BLAST_FURNACE.addRecipe(new SimpleMachineRecipe(new Crafting(DummyCraftingHandler.INSTANCE).setRecipeKey("steel_coke")//
 				.setInput(new IngredientStack("ingotIron"), new IngredientStack("fuelCoke"))//
 				.setOutput(ModItems.STEEL.of(Shape.INGOT))//
 				.setTotalTime(2560)));

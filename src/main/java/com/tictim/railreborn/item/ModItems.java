@@ -3,7 +3,9 @@ package com.tictim.railreborn.item;
 import com.tictim.railreborn.RailReborn;
 import com.tictim.railreborn.block.ModBlocks;
 import com.tictim.railreborn.config.RailRebornCfg;
+import com.tictim.railreborn.enums.Metals;
 import com.tictim.railreborn.enums.Misc;
+import com.tictim.railreborn.enums.Multibricks;
 import com.tictim.railreborn.enums.Shape;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
@@ -12,6 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -32,25 +35,46 @@ public final class ModItems{
 		}
 	};
 	
-	public static final Item MISC = new ItemMisc().setRegistryName("misc").setUnlocalizedName("misc").setCreativeTab(TAB_ITEMS);
-	public static final ItemRefinedMetal IRON = (ItemRefinedMetal)new ItemRefinedMetal().setShapes(Shape.DUST, Shape.PLATE, Shape.GEAR).setRegistryName("iron").setUnlocalizedName("railReborn.iron").setCreativeTab(TAB_ITEMS);
-	public static final ItemRefinedMetal GOLD = (ItemRefinedMetal)new ItemRefinedMetal().setShapes(Shape.DUST, Shape.PLATE, Shape.GEAR).setRegistryName("gold").setUnlocalizedName("railReborn.gold").setCreativeTab(TAB_ITEMS);
-	public static final ItemRefinedMetal STEEL = (ItemRefinedMetal)new ItemRefinedMetal().setRegistryName("steel").setUnlocalizedName("railReborn.steel").setCreativeTab(TAB_ITEMS);
-	public static final ItemRefinedMetal STAINLESS_STEEL = (ItemRefinedMetal)new ItemRefinedMetal().setRegistryName("stainless_steel").setUnlocalizedName("railReborn.stainless_steel").setCreativeTab(TAB_ITEMS);
-	public static final ItemRefinedMetal CHROME = (ItemRefinedMetal)new ItemRefinedMetal().setShapes(Shape.INGOT, Shape.NUGGET, Shape.DUST).setRegistryName("chrome").setUnlocalizedName("railReborn.chrome").setCreativeTab(TAB_ITEMS);
+	public static final Item MISC = new ItemMisc();
+	public static final ItemRefinedMetal IRON = (ItemRefinedMetal)new ItemRefinedMetal().setShapes(Shape.DUST, Shape.PLATE, Shape.GEAR);
+	public static final ItemRefinedMetal GOLD = (ItemRefinedMetal)new ItemRefinedMetal().setShapes(Shape.DUST, Shape.PLATE, Shape.GEAR);
+	public static final ItemRefinedMetal STEEL = (ItemRefinedMetal)new ItemRefinedMetal();
+	public static final ItemRefinedMetal STAINLESS_STEEL = (ItemRefinedMetal)new ItemRefinedMetal();
+	public static final ItemRefinedMetal CHROME = (ItemRefinedMetal)new ItemRefinedMetal().setShapes(Shape.INGOT, Shape.NUGGET, Shape.DUST);
 	
-	public static final Item CROWBAR_IRON = new ItemCrowbar(6, 400, "ingotIron", EnumRarity.COMMON, EnumRarity.RARE).setRegistryName("crowbar_iron").setUnlocalizedName("crowbar_iron").setCreativeTab(TAB_ITEMS);
-	public static final Item CROWBAR_STEEL = new ItemCrowbar(9, 800, "ingotSteel", EnumRarity.UNCOMMON, EnumRarity.RARE).setRegistryName("crowbar_steel").setUnlocalizedName("crowbar_steel").setCreativeTab(TAB_ITEMS);
-	public static final Item CROWBAR_STAINLESS = new ItemCrowbar(8, 1200, Shape.INGOT.oreName(RailRebornCfg.getStainlessName()), EnumRarity.RARE, EnumRarity.EPIC).setRegistryName("crowbar_stainless").setUnlocalizedName("crowbar_stainless").setCreativeTab(TAB_ITEMS);
-	public static final Item CROWBAR_FOOL = new ItemFoolsCrowbar().setRegistryName("crowbar_fool").setUnlocalizedName("crowbar_fool").setCreativeTab(TAB_ITEMS);
+	public static final Item CROWBAR_IRON = new ItemCrowbar(6, 400, "ingotIron", EnumRarity.COMMON, EnumRarity.RARE);
+	public static final Item CROWBAR_STEEL = new ItemCrowbar(9, 800, "ingotSteel", EnumRarity.UNCOMMON, EnumRarity.RARE);
+	public static final Item CROWBAR_STAINLESS = new ItemCrowbar(8, 1200, Shape.INGOT.oreName(RailRebornCfg.getStainlessName()), EnumRarity.RARE, EnumRarity.EPIC);
+	public static final Item CROWBAR_FOOL = new ItemFoolsCrowbar();
 	
-	public static final Item COAL_COKE_BLOCK = new ItemBlock(ModBlocks.COAL_COKE_BLOCK).setRegistryName("coal_coke_block");
-	public static final Item ORE_TIN = new ItemBlock(ModBlocks.ORE_TIN).setRegistryName("ore_tin");
-	public static final Item ORE_CHROME = new ItemBlock(ModBlocks.ORE_CHROME).setRegistryName("ore_chrome");
-	public static final ItemBlockVar METAL_BLOCKS = (ItemBlockVar)new ItemBlockVar(ModBlocks.METAL_BLOCKS).setRegistryName("metal_block");
-	public static final ItemBlockVar BRICKS = (ItemBlockVar)new ItemBlockVar(ModBlocks.BRICKS).setTooltip("tooltip.safe_for_decoration", "tooltip.not_multiblock_part").setRegistryName("brick");
+	public static final Item COAL_COKE_BLOCK = new ItemBlock(ModBlocks.COAL_COKE_BLOCK);
+	public static final Item ORE_TIN = new ItemBlock(ModBlocks.ORE_TIN);
+	public static final Item ORE_CHROME = new ItemBlock(ModBlocks.ORE_CHROME);
+	public static final ItemBlockVar<Metals> METAL_BLOCKS = new ItemBlockVar<>(ModBlocks.METAL_BLOCKS);
+	public static final ItemBlockVar<Multibricks> BRICKS = new ItemBlockVar<>(ModBlocks.BRICKS);
 	public static final ItemBlockMultibrickCore MULTIBRICK_CORE = new ItemBlockMultibrickCore(ModBlocks.MULTIBRICK_CORE);
-	public static final ItemBlockVar MULTIBRICK_PART = (ItemBlockVar)new ItemBlockVar(ModBlocks.MULTIBRICK_PART).setTooltip("tooltip.prevents_spawn").setRegistryName("multibrick_part");
+	public static final ItemBlockVar<Multibricks> MULTIBRICK_PART = new ItemBlockVar<>(ModBlocks.MULTIBRICK_PART);
+	
+	static{
+		MISC.setRegistryName("misc").setUnlocalizedName("misc").setCreativeTab(TAB_ITEMS);
+		IRON.setRegistryName("iron").setUnlocalizedName("railReborn.iron").setCreativeTab(TAB_ITEMS);
+		GOLD.setRegistryName("gold").setUnlocalizedName("railReborn.gold").setCreativeTab(TAB_ITEMS);
+		STEEL.setRegistryName("steel").setUnlocalizedName("railReborn.steel").setCreativeTab(TAB_ITEMS);
+		STAINLESS_STEEL.setRegistryName("stainless_steel").setUnlocalizedName("railReborn.stainless_steel").setCreativeTab(TAB_ITEMS);
+		CHROME.setRegistryName("chrome").setUnlocalizedName("railReborn.chrome").setCreativeTab(TAB_ITEMS);
+		
+		CROWBAR_IRON.setRegistryName("crowbar_iron").setUnlocalizedName("crowbar_iron").setCreativeTab(TAB_ITEMS);
+		CROWBAR_STEEL.setRegistryName("crowbar_steel").setUnlocalizedName("crowbar_steel").setCreativeTab(TAB_ITEMS);
+		CROWBAR_STAINLESS.setRegistryName("crowbar_stainless").setUnlocalizedName("crowbar_stainless").setCreativeTab(TAB_ITEMS);
+		CROWBAR_FOOL.setRegistryName("crowbar_fool").setUnlocalizedName("crowbar_fool").setCreativeTab(TAB_ITEMS);
+		
+		COAL_COKE_BLOCK.setRegistryName("coal_coke_block");
+		ORE_TIN.setRegistryName("ore_tin");
+		ORE_CHROME.setRegistryName("ore_chrome");
+		METAL_BLOCKS.setRegistryName("metal_block");
+		BRICKS.setTooltip("tooltip.safe_for_decoration", "tooltip.not_multiblock_part").setRegistryName("brick");
+		MULTIBRICK_PART.setTooltip("tooltip.prevents_spawn").setRegistryName("multibrick_part");
+	}
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event){
@@ -74,7 +98,6 @@ public final class ModItems{
 		registry.register(BRICKS);
 		registry.register(MULTIBRICK_CORE);
 		registry.register(MULTIBRICK_PART);
-		RailReborn.proxy.registerModels();
 	}
 	
 	public static void registerOreDict(){
@@ -99,8 +122,9 @@ public final class ModItems{
 		// Metal Blocks
 	}
 	
+	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public static void registerModels(){
+	public static void registerModels(ModelRegistryEvent event){
 		for(Misc m: Misc.values())
 			ModelLoader.setCustomModelResourceLocation(MISC, m.ordinal(), mrl("misc/"+m.name().toLowerCase()));
 		IRON.registerModels("iron");

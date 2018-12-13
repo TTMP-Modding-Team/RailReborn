@@ -53,6 +53,7 @@ public class LogicCokeOven extends Logic implements InventoryBuilder, Machine, S
 		if(crafting!=null) crafting.update();
 		else if(!inv.getStackInSlot(0).isEmpty()){
 			crafting = MachineRecipes.COKE_OVEN.getCrafting(this);
+			if(crafting!=null&&!crafting.extractInput(this.inputSlotHandler(), false)) crafting = null;
 		}
 	}
 	
@@ -130,11 +131,8 @@ public class LogicCokeOven extends Logic implements InventoryBuilder, Machine, S
 	
 	@Override
 	public void collectResult(Crafting c){
-		if(c.extractInput(this.inputSlotHandler(), true)){
-			c.extractInput(this.inputSlotHandler(), false);
-			c.insertOutput(this.outputSlotHandler(), false);
-			c.insertFluidOutput(this.outputFluidHandler(), false);
-		}else c.cancel();
+		c.insertOutput(this.outputSlotHandler(), false);
+		c.insertFluidOutput(this.outputFluidHandler(), false);
 	}
 	
 	@Override

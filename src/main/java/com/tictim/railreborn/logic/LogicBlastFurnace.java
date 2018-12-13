@@ -44,6 +44,7 @@ public class LogicBlastFurnace extends Logic implements InventoryBuilder, Machin
 		if(crafting!=null) crafting.update();
 		else if(!inv.getStackInSlot(0).isEmpty()||!inv.getStackInSlot(1).isEmpty()){
 			crafting = MachineRecipes.BLAST_FURNACE.getCrafting(this);
+			if(crafting!=null&&!crafting.extractInput(this.inputSlotHandler(), false)) crafting = null;
 		}
 	}
 	
@@ -104,10 +105,7 @@ public class LogicBlastFurnace extends Logic implements InventoryBuilder, Machin
 	
 	@Override
 	public void collectResult(Crafting c){
-		if(c.extractInput(this.inputSlotHandler(), true)){
-			c.extractInput(this.inputSlotHandler(), false);
-			c.insertOutput(this.outputSlotHandler(), false);
-		}else c.cancel();
+		c.insertOutput(this.outputSlotHandler(), false);
 	}
 	
 	@Override

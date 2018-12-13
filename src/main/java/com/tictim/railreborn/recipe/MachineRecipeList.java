@@ -14,10 +14,16 @@ public class MachineRecipeList implements MachineRecipe{
 	
 	private final Map<String, MachineRecipe> recipes = new HashMap<>();
 	private final String key;
+	private final RecipeExpect expect = new RecipeExpect();
 	
 	public MachineRecipeList(String key){
 		this.key = key;
 		this.expectValidKey();
+	}
+	
+	public MachineRecipeList(String key, RecipeExpect expect){
+		this(key);
+		this.expect.copy(expect);
 	}
 	
 	@Override
@@ -75,6 +81,11 @@ public class MachineRecipeList implements MachineRecipe{
 			}
 		}
 		return null;
+	}
+	
+	@Override
+	public void expectCrafting(RecipeExpect expect){
+		for(MachineRecipe recipe: this.recipes.values()) recipe.expectCrafting(expect);
 	}
 	
 	@Override

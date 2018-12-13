@@ -38,7 +38,7 @@ public abstract class TELogic extends TileEntity implements Debugable{
 	public JsonElement getDebugInfo(){
 		JsonObject obj = new JsonObject();
 		addDebugInfo(obj);
-		obj.add("Logic", logic==null ? JsonNull.INSTANCE : logic.getDebugInfo());
+		obj.add("", logic==null ? JsonNull.INSTANCE : logic.getDebugInfo());
 		return Debugable.stateClassType(this.getClass(), obj);
 	}
 	

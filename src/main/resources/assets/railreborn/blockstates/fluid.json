@@ -1,0 +1,15 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"model": "forge:fluid"
+	},
+	"variants": {
+		"railreborn.creosote_oil": [
+			{
+				"custom": {
+					"fluid": "railreborn.creosote_oil"
+				}
+			}
+		]
+	}
+}

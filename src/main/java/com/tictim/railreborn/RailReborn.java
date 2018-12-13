@@ -33,21 +33,23 @@ public class RailReborn{
 	@Mod.Instance(value = MODID)
 	public static RailReborn instance;
 	
-	@SidedProxy(modId = MODID, clientSide = "com.tictim.railreborn.ClientProxy", serverSide = "com.tictim.railrebory.CommonProxy")
+	@SidedProxy(modId = MODID, clientSide = "com.tictim.railreborn.ClientProxy", serverSide = "com.tictim.railreborn.CommonProxy")
 	public static CommonProxy proxy;
 	
 	public static final SimpleNetworkWrapper NET = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
 	public static final Logger LOGGER = LogManager.getLogger(NAME);
 	
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event){
-		ModItems.MISC.toString();
+	{
 		ModFluids.init();
 	}
 	
 	@EventHandler
+	public void preInit(FMLPreInitializationEvent event){
+		ModItems.MISC.toString();
+	}
+	
+	@EventHandler
 	public void init(FMLInitializationEvent event){
-		proxy.init();
 		ModItems.registerOreDict();
 		MachineRecipes.addMachineRecipes();
 		Blueprints.COKE_OVEN.toString();

@@ -37,6 +37,7 @@ public interface MachineRecipe{
 	Crafting getCrafting(String key);
 	
 	String getKey();
+	void expectCrafting(RecipeExpect expect);
 	
 	default void expectValidKey(){
 		String key = getKey();
@@ -46,4 +47,5 @@ public interface MachineRecipe{
 	default Pattern keyPattern(){
 		return MachineRecipes.RECIPE_KEY_PATTERN;
 	}
+	
 }

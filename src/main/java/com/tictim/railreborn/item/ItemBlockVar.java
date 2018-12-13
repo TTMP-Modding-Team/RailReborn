@@ -1,18 +1,20 @@
 package com.tictim.railreborn.item;
 
-import static com.tictim.railreborn.item.ModItems.mrl;
-
 import com.tictim.railreborn.block.BlockVar;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.IStringSerializable;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemBlockVar extends ItemBlockBase{
-	private final BlockVar<?> blockVar;
+import java.util.function.BiConsumer;
+
+import static com.tictim.railreborn.item.ModItems.mrl;
+
+public class ItemBlockVar<E extends Enum<E>&IStringSerializable> extends ItemBlockBase{
+	private final BlockVar<E> blockVar;
 	
-	public ItemBlockVar(BlockVar<?> block){
+	public ItemBlockVar(BlockVar<E> block){
 		super(block);
 		this.blockVar = block;
 		this.setHasSubtypes(true);
@@ -33,5 +35,11 @@ public class ItemBlockVar extends ItemBlockBase{
 		String p = getRegistryName().getResourcePath();
 		for(int i = 0, j = blockVar.getProperty().getAllowedValues().size(); i<j; i++)
 			ModelLoader.setCustomModelResourceLocation(this, i, mrl(p+"_"+blockVar.fromMeta(i).getName()));
+	}
+	
+	public void forEachVariations(BiConsumer<E, ItemStack> consumer){
+		for(int i = 0, j = blockVar.getProperty().getAllowedValues().size(); i<j; i++){
+			consumer.accept(blockVar.fromMeta(i), new ItemStack(this, 1, i));
+		}
 	}
 }

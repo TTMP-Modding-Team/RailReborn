@@ -5,10 +5,10 @@ import net.minecraftforge.fluids.Fluid;
 
 import javax.annotation.Nullable;
 
-public class MachineRecipeImpl implements MachineRecipe{
+public class SimpleMachineRecipe implements MachineRecipe{
 	private final Crafting c;
 	
-	public MachineRecipeImpl(Crafting c){
+	public SimpleMachineRecipe(Crafting c){
 		this.c = c;
 		expectValidKey();
 	}
@@ -37,6 +37,11 @@ public class MachineRecipeImpl implements MachineRecipe{
 	@Override
 	public Crafting getCrafting(String key){
 		return key==null||!key.equals(c.getRecipeKey()) ? null : new Crafting(c);
+	}
+	
+	@Override
+	public void expectCrafting(RecipeExpect expect){
+		expect.expect(c);
 	}
 	
 	@Override

@@ -17,6 +17,7 @@ import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 public final class Crafting implements ITickable, Debugable{
 	private final Machine handler;
@@ -180,6 +181,7 @@ public final class Crafting implements ITickable, Debugable{
 	
 	public Crafting setInput(IngredientStack... input){
 		this.input = input==null||input.length==0 ? null : input;
+		this.extractions = null;
 		return this;
 	}
 	
@@ -287,39 +289,65 @@ public final class Crafting implements ITickable, Debugable{
 		expect(this.fluidOutput, min, max, "Unexpected fluid output size %d, must between %d and %d");
 	}
 	
+	/**
+	 * [input] [handler]
+	 */
+	@Nullable
+	private int[][] extractions;
+	
 	public boolean extractInput(IItemHandler handler, boolean simulate){
 		if(this.input!=null&&this.input.length>0){
-			int[] quantities = new int[this.input.length];
-			int[] consumed = new int[handler.getSlots()];
-			
-			for(int i = 0; i<consumed.length; i++){
-				ItemStack s = handler.extractItem(i, 64, true);
-				if(s.isEmpty()) continue;
-				int stackLeft = s.getCount();
-				
-				for(int j = 0; j<input.length; j++){
-					IngredientStack ing = input[j];
-					if(ing.getQuantity()>quantities[j]){
-						int valLeft = Math.min(stackLeft, ing.getQuantity()-quantities[j]);
-						if(ing.getIngredient().test(s)){
-							quantities[j] += valLeft;
-							stackLeft -= valLeft;
-							consumed[i] += valLeft;
-							if(stackLeft<=0) break;
+			if(extractions!=null){
+				if(extractions.length!=this.input.length||extractions[0].length!=handler.getSlots()) extractions = null;
+				else{
+					L0:
+					for(int i = 0; i<this.extractions.length; i++){
+						IngredientStack ing = input[i];
+						int[] arr = this.extractions[i];
+						if(IntStream.of(arr).sum()!=ing.getQuantity()){
+							extractions = null;
+							break;
 						}
-					}else break;
+						for(int j = 0; j<arr.length; j++){
+							ItemStack s = handler.extractItem(j, arr[j], true);
+							if(s.getCount()<arr[j]||!ing.getIngredient().test(s)){
+								extractions = null;
+								break L0;
+							}
+						}
+					}
 				}
 			}
-			for(int i = 0; i<quantities.length; i++){
-				if(input[i].getQuantity()<quantities[i]) return false;
+			if(extractions==null){
+				extractions = new int[this.input.length][handler.getSlots()];
+				for(int i = 0; i<this.extractions.length; i++){
+					IngredientStack ing = input[i];
+					int[] arr = this.extractions[i];
+					int stackLeft = ing.getQuantity();
+					for(int j = 0; j<arr.length; j++){
+						ItemStack s = handler.extractItem(j, 64, true);
+						if(!s.isEmpty()&&ing.getIngredient().test(s)){
+							stackLeft -= arr[j] = Math.min(stackLeft, s.getCount());
+						}
+					}
+					if(stackLeft>0){
+						extractions = null;
+						return false;
+					}
+				}
 			}
-			if(!simulate) for(int i = 0; i<consumed.length; i++){
-				if(consumed[i]>0) handler.extractItem(i, consumed[i], false);
+			
+			if(!simulate) for(int i = 0, i0 = handler.getSlots(); i<i0; i++){
+				int req = 0;
+				for(int j = 0; j<this.extractions.length; j++)
+					req += this.extractions[j][i];
+				if(req>0&&handler.extractItem(i, req, false).getCount()!=req) RailReborn.LOGGER.error("Unexpected extractInput operation occured. ");
 			}
 		}
 		return true;
 	}
 	
+	// TODO Fix this later, now im completely exhausted
 	public boolean insertOutput(IItemHandler handler, boolean simulate){
 		if(this.output!=null&&this.output.length>0){
 			for(int i = 0; i<this.output.length; i++){
@@ -336,6 +364,7 @@ public final class Crafting implements ITickable, Debugable{
 		return true;
 	}
 	
+	// TODO Fix this later, now im completely exhausted
 	public boolean extractFluidInput(IFluidHandler handler, boolean simulate){
 		if(this.fluidInput!=null&&this.fluidInput.length>0){
 			for(int i = 0; i<this.fluidInput.length; i++){
@@ -349,6 +378,7 @@ public final class Crafting implements ITickable, Debugable{
 		return true;
 	}
 	
+	// TODO Fix this later, now im completely exhausted
 	public boolean insertFluidOutput(IFluidHandler handler, boolean simulate){
 		if(this.fluidOutput!=null&&this.fluidOutput.length>0){
 			for(int i = 0; i<this.fluidOutput.length; i++){
