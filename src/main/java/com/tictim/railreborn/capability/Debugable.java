@@ -7,6 +7,7 @@ import com.google.gson.JsonPrimitive;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -64,7 +65,7 @@ public interface Debugable{
 	}
 	
 	static JsonPrimitive debugItemStack(ItemStack stack){
-		if(stack.isEmpty()) return new JsonPrimitive("Empty");
+		if(stack.isEmpty()) return new JsonPrimitive(TextFormatting.GRAY+"Empty"+TextFormatting.RESET);
 		else{
 			Item i = stack.getItem();
 			StringBuilder stb = new StringBuilder(stack.getItem().getRegistryName().toString());
@@ -90,14 +91,24 @@ public interface Debugable{
 	}
 	
 	static JsonPrimitive debugFluidStack(@Nullable FluidStack fluid){
-		return new JsonPrimitive(fluid==null||fluid.amount<=0 ? "Empty" : fluid.getFluid().getName()+" * "+TextFormatting.GOLD+fluid.amount);
+		return new JsonPrimitive(fluid==null||fluid.amount<=0 ? TextFormatting.GRAY+"Empty"+TextFormatting.RESET : fluid.getFluid().getName()+" * "+TextFormatting.GOLD+fluid.amount);
 	}
 	
 	static JsonPrimitive debugFluidTank(IFluidTank tank){
 		FluidStack fluid = tank.getFluid();
 		boolean isEmpty = fluid==null||fluid.amount<=0;
-		String fluidStr = isEmpty ? "Empty" : fluid.getFluid().getName();
+		String fluidStr = isEmpty ? TextFormatting.GRAY+"Empty"+TextFormatting.RESET : fluid.getFluid().getName();
 		return new JsonPrimitive(fluidStr+" ( "+TextFormatting.GOLD+(isEmpty ? 0 : fluid.amount)+TextFormatting.RESET+" / "+TextFormatting.GOLD+tank.getCapacity()+TextFormatting.RESET+" )");
+	}
+	
+	static JsonElement debugTileEntity(TileEntity te){
+		Debugable d = te.getCapability(Debugable.CAP, null);
+		if(d!=null) return d.getDebugInfo();
+		else{
+			JsonArray arr = new JsonArray();
+			arr.add(TextFormatting.GRAY+"This TileEntity is not debugable."+TextFormatting.RESET);
+			return stateClassType(te.getClass(), arr);
+		}
 	}
 	
 	static JsonArray cutOff(JsonArray arr, int maxLength){

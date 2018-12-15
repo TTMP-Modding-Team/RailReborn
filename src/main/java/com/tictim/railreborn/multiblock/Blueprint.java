@@ -1,11 +1,6 @@
 package com.tictim.railreborn.multiblock;
 
-import java.util.Collection;
-import java.util.Collections;
-import javax.annotation.Nullable;
-
 import com.google.common.collect.ImmutableSet;
-import com.tictim.railreborn.RailReborn;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.state.IBlockState;
@@ -13,6 +8,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Collections;
 
 public class Blueprint{
 	private final Floor[] floors;
@@ -33,6 +32,14 @@ public class Blueprint{
 			EnumFacing f = s.getValue(BlockDirectional.FACING);
 			if(f.getAxis()!=Axis.Y) return test(world, core, f);
 		}
+		/*
+		TestResult r = null;
+		for(EnumFacing facing : EnumFacing.HORIZONTALS){
+			r = test(world, core, facing);
+			if(r.isValid()) break;
+		}
+		return r;
+		*/
 		return new TestResult(false, null);
 	}
 	

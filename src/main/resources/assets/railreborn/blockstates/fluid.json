@@ -10,6 +10,27 @@
 					"fluid": "railreborn.creosote_oil"
 				}
 			}
+		],
+		"railreborn.oil": [
+			{
+				"custom": {
+					"fluid": "railreborn.oil"
+				}
+			}
+		],
+		"railreborn.diesel": [
+			{
+				"custom": {
+					"fluid": "railreborn.diesel"
+				}
+			}
+		],
+		"railreborn.steam": [
+			{
+				"custom": {
+					"fluid": "railreborn.steam"
+				}
+			}
 		]
 	}
 }

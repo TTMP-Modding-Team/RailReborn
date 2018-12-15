@@ -1,0 +1,7 @@
+{
+	"parent": "block/cube_column",
+	"textures": {
+		"end": "railreborn:block/treated_woods",
+		"side": "railreborn:block/treated_woods_vertical"
+	}
+}

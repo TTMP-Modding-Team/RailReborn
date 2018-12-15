@@ -19,7 +19,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-public class TEMultibrickPart extends TileEntity implements Debugable{
+public class TEMultiblockPart extends TileEntity implements Debugable{
 	@Nullable
 	private BlockPos core;
 	
@@ -42,10 +42,9 @@ public class TEMultibrickPart extends TileEntity implements Debugable{
 	}
 	
 	@Nullable
-	public TEMultibrick getCore(){
+	public TileEntity getCore(){
 		if(this.core==null) return null;
-		TileEntity te = world.getTileEntity(core);
-		return te instanceof TEMultibrick ? (TEMultibrick)te : null;
+		return world.getTileEntity(core);
 	}
 	
 	@Override
@@ -83,10 +82,10 @@ public class TEMultibrickPart extends TileEntity implements Debugable{
 	@Override
 	public JsonElement getDebugInfo(){
 		JsonObject obj = new JsonObject();
-		obj.add("Multibrick Core Position", core==null ? JsonNull.INSTANCE : new JsonPrimitive(Blueprint.posToStr(core)));
+		obj.add("Multiblock Core Position", core==null ? JsonNull.INSTANCE : new JsonPrimitive(Blueprint.posToStr(core)));
 		if(core!=null){
-			TEMultibrick core = getCore();
-			obj.add("", core==null ? JsonNull.INSTANCE : core.getDebugInfo());
+			TileEntity core = getCore();
+			obj.add("", core==null ? JsonNull.INSTANCE : Debugable.debugTileEntity(core));
 		}
 		return Debugable.stateClassType(this.getClass(), obj);
 	}
@@ -94,7 +93,7 @@ public class TEMultibrickPart extends TileEntity implements Debugable{
 	@Override
 	public boolean hasCapability(Capability<?> cap, EnumFacing facing){
 		if(cap==Debugable.CAP) return true;
-		TEMultibrick core = getCore();
+		TileEntity core = getCore();
 		return core!=null&&core.hasCapability(cap, facing)||super.hasCapability(cap, facing);
 	}
 	
@@ -102,7 +101,7 @@ public class TEMultibrickPart extends TileEntity implements Debugable{
 	@Nullable
 	public <T> T getCapability(Capability<T> cap, EnumFacing facing){
 		if(cap==Debugable.CAP) return (T)this;
-		TEMultibrick core = getCore();
+		TileEntity core = getCore();
 		T t = core!=null ? core.getCapability(cap, facing) : null;
 		return t!=null ? t : super.getCapability(cap, facing);
 	}

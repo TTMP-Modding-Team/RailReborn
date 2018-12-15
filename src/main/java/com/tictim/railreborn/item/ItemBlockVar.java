@@ -32,9 +32,13 @@ public class ItemBlockVar<E extends Enum<E>&IStringSerializable> extends ItemBlo
 	
 	@SideOnly(Side.CLIENT)
 	public void registerModels(){
-		String p = getRegistryName().getResourcePath();
+		registerModels(getRegistryName().getResourcePath());
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public void registerModels(String prefix){
 		for(int i = 0, j = blockVar.getProperty().getAllowedValues().size(); i<j; i++)
-			ModelLoader.setCustomModelResourceLocation(this, i, mrl(p+"_"+blockVar.fromMeta(i).getName()));
+			ModelLoader.setCustomModelResourceLocation(this, i, mrl(prefix+"_"+blockVar.fromMeta(i).getName()));
 	}
 	
 	public void forEachVariations(BiConsumer<E, ItemStack> consumer){

@@ -13,8 +13,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ItemBlockMultibrickCore extends ItemBlockBase{
 	public ItemBlockMultibrickCore(Block block){
 		super(block);
-		this.setRegistryName(block.getRegistryName()).setHasSubtypes(true);
-		this.setTooltip("tooltip.prevents_spawn");
+		this.setHasSubtypes(true);
 	}
 	
 	@Override

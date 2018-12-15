@@ -5,6 +5,8 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.tictim.railreborn.capability.Debugable;
 import com.tictim.railreborn.logic.Logic;
+import com.tictim.railreborn.util.NBTTypes;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.ITextComponent;
@@ -25,10 +27,14 @@ public abstract class TELogic extends TileEntity implements Debugable{
 		if(logic!=null) this.logic.invalidate(this, null);
 	}
 	
+	public boolean isLogicValid(){
+		return logic!=null&&logic.isValid();
+	}
+	
 	@Nullable
 	@Override
 	public ITextComponent getDisplayName(){
-		return logic==null ? null : logic.getInventory().getDisplayName();
+		return logic==null ? null : logic.getDisplayName();
 	}
 	
 	@Nullable
@@ -56,5 +62,23 @@ public abstract class TELogic extends TileEntity implements Debugable{
 		if(cap==Debugable.CAP) return (T)this;
 		T t = logic!=null ? logic.getCapability(cap, facing) : null;
 		return t!=null ? t : super.getCapability(cap, facing);
+	}
+	
+	@Override
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt){
+		super.writeToNBT(nbt);
+		if(logic!=null){
+			NBTTagCompound subnbt = logic.serializeNBT();
+			if(!subnbt.hasNoTags()) nbt.setTag("logic", subnbt);
+		}
+		return nbt;
+	}
+	
+	@Override
+	public void readFromNBT(NBTTagCompound nbt){
+		super.readFromNBT(nbt);
+		if(logic!=null&&nbt.hasKey("logic", NBTTypes.COMPOUND)){
+			logic.deserializeNBT(nbt.getCompoundTag("logic"));
+		}
 	}
 }

@@ -1,6 +1,5 @@
 package com.tictim.railreborn.enums;
 
-import com.tictim.railreborn.RailRebornGui;
 import com.tictim.railreborn.logic.Logic;
 import com.tictim.railreborn.logic.LogicBlastFurnace;
 import com.tictim.railreborn.logic.LogicCokeOven;
@@ -33,15 +32,6 @@ public enum Multibricks implements IStringSerializable{
 				return Blueprints.BLAST_FURNACE;
 			default: // case COKE_OVEN:
 				return Blueprints.COKE_OVEN;
-		}
-	}
-	
-	public RailRebornGui getGui(boolean core){
-		switch(this){
-			case BLAST_FURNACE:
-				return core ? RailRebornGui.BLAST_FURNACE : RailRebornGui.BLAST_FURNACE_FROM_PART;
-			default: // case COKE_OVEN:
-				return core ? RailRebornGui.COKE_OVEN : RailRebornGui.COKE_OVEN_FROM_PART;
 		}
 	}
 	

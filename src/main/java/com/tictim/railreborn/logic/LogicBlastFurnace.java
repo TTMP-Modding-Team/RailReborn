@@ -15,7 +15,7 @@ import com.tictim.railreborn.multiblock.Blueprint.TestResult;
 import com.tictim.railreborn.recipe.Crafting;
 import com.tictim.railreborn.recipe.Machine;
 import com.tictim.railreborn.recipe.MachineRecipes;
-import com.tictim.railreborn.tileentity.TEMultibrickPart;
+import com.tictim.railreborn.tileentity.TEMultiblockPart;
 import com.tictim.railreborn.util.NBTTypes;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,6 +26,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -52,7 +53,7 @@ public class LogicBlastFurnace extends Logic implements InventoryBuilder, Machin
 	protected void onValidate(TileEntity te, @Nullable TestResult multiblockTest){
 		if(multiblockTest!=null) for(BlockPos pos: multiblockTest.getGroup(1)){
 			TileEntity te2 = te.getWorld().getTileEntity(pos);
-			if(te2 instanceof TEMultibrickPart) ((TEMultibrickPart)te2).setCorePos(te.getPos());
+			if(te2 instanceof TEMultiblockPart) ((TEMultiblockPart)te2).setCorePos(te.getPos());
 		}
 	}
 	
@@ -153,8 +154,8 @@ public class LogicBlastFurnace extends Logic implements InventoryBuilder, Machin
 	}
 	
 	@Override
-	public Inventory getInventory(){
-		return this.inv;
+	public ITextComponent getDisplayName(){
+		return this.inv.getDisplayName();
 	}
 	
 	@Nullable

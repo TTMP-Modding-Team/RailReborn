@@ -4,5 +4,5 @@
 		"top": "railreborn:block/coke_oven",
 		"front": "railreborn:block/coke_oven_core",
 		"side": "railreborn:block/coke_oven"
-	}
+	}, "uvlock": true
 }

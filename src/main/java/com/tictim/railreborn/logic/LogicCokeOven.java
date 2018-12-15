@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.tictim.railreborn.RailReborn;
 import com.tictim.railreborn.capability.Debugable;
 import com.tictim.railreborn.client.gui.GuiCokeOven;
+import com.tictim.railreborn.fluid.FluidWrapper;
 import com.tictim.railreborn.inventory.ContainerCokeOven;
 import com.tictim.railreborn.inventory.Inventory;
 import com.tictim.railreborn.inventory.InventoryBuilder;
@@ -15,7 +16,7 @@ import com.tictim.railreborn.multiblock.Blueprint.TestResult;
 import com.tictim.railreborn.recipe.Crafting;
 import com.tictim.railreborn.recipe.Machine;
 import com.tictim.railreborn.recipe.MachineRecipes;
-import com.tictim.railreborn.tileentity.TEMultibrickPart;
+import com.tictim.railreborn.tileentity.TEMultiblockPart;
 import com.tictim.railreborn.util.NBTTypes;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,6 +27,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
@@ -61,7 +63,7 @@ public class LogicCokeOven extends Logic implements InventoryBuilder, Machine, S
 	protected void onValidate(TileEntity te, @Nullable TestResult multiblockTest){
 		if(multiblockTest!=null) for(BlockPos pos: multiblockTest.getGroup(1)){
 			TileEntity te2 = te.getWorld().getTileEntity(pos);
-			if(te2 instanceof TEMultibrickPart) ((TEMultibrickPart)te2).setCorePos(te.getPos());
+			if(te2 instanceof TEMultiblockPart) ((TEMultiblockPart)te2).setCorePos(te.getPos());
 		}
 		resetTank();
 	}
@@ -70,7 +72,7 @@ public class LogicCokeOven extends Logic implements InventoryBuilder, Machine, S
 	protected void onInvalidate(TileEntity te, @Nullable TestResult multiblockTest){
 		if(multiblockTest!=null) for(BlockPos pos: multiblockTest.getGroup(1)){
 			TileEntity te2 = te.getWorld().getTileEntity(pos);
-			if(te2 instanceof TEMultibrickPart) ((TEMultibrickPart)te2).setCorePos(null);
+			if(te2 instanceof TEMultiblockPart) ((TEMultiblockPart)te2).setCorePos(null);
 		}
 		if(crafting!=null){
 			crafting.cancel();
@@ -185,8 +187,8 @@ public class LogicCokeOven extends Logic implements InventoryBuilder, Machine, S
 	}
 	
 	@Override
-	public Inventory getInventory(){
-		return this.inv;
+	public ITextComponent getDisplayName(){
+		return this.inv.getDisplayName();
 	}
 	
 	@Nullable
@@ -258,28 +260,7 @@ public class LogicCokeOven extends Logic implements InventoryBuilder, Machine, S
 		if(cap==CapabilityItemHandler.ITEM_HANDLER_CAPABILITY){
 			return (T)this.inv.create(facing);
 		}else if(cap==CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY){
-			if(tankCapability==null){
-				tankCapability = new IFluidHandler(){
-					@Override
-					public IFluidTankProperties[] getTankProperties(){
-						return tank.getTankProperties();
-					}
-					@Override
-					public int fill(FluidStack resource, boolean doFill){
-						return 0;
-					}
-					@Nullable
-					@Override
-					public FluidStack drain(FluidStack resource, boolean doDrain){
-						return tank.drain(resource, doDrain);
-					}
-					@Nullable
-					@Override
-					public FluidStack drain(int maxDrain, boolean doDrain){
-						return tank.drain(maxDrain, doDrain);
-					}
-				};
-			}
+			if(tankCapability==null) tankCapability = new FluidWrapper(tank, false, true);
 			return (T)tankCapability;
 		}else return super.getCapability(cap, facing);
 	}

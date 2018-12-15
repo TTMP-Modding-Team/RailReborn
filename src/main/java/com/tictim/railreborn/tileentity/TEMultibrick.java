@@ -1,7 +1,6 @@
 package com.tictim.railreborn.tileentity;
 
 import com.google.gson.JsonObject;
-import com.tictim.railreborn.block.BlockMultibrickCore;
 import com.tictim.railreborn.client.tesr.TESRMultiblockDebug.MultiblockDebugable;
 import com.tictim.railreborn.enums.Multibricks;
 import com.tictim.railreborn.logic.Logic;
@@ -12,7 +11,6 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -24,9 +22,7 @@ import javax.annotation.Nullable;
 public class TEMultibrick extends TELogic implements ITickable, MultiblockDebugable{
 	@Nullable
 	private Multibricks multibrick;
-	
 	private int tick;
-	private boolean valid;
 	
 	public Multibricks getMultibrick(){
 		return this.multibrick;
@@ -38,14 +34,10 @@ public class TEMultibrick extends TELogic implements ITickable, MultiblockDebuga
 		return multibrick==null ? null : multibrick.createLogic();
 	}
 	
-	public TileEntity setMultibrick(Multibricks value){
+	public TEMultibrick setMultibrick(Multibricks value){
 		this.multibrick = value;
 		this.resetLogic();
 		return this;
-	}
-	
-	public boolean isLogicValid(){
-		return logic!=null&&valid;
 	}
 	
 	public Container getContainer(EntityPlayer player, Multibricks assure){
@@ -65,12 +57,12 @@ public class TEMultibrick extends TELogic implements ITickable, MultiblockDebuga
 			if((++tick) >= 10){
 				tick = 0;
 				TestResult r = multibrick.getBlueprint().test(world, pos);
-				if(valid!=r.isValid()){
-					if(valid = r.isValid()) logic.validate(this, r);
+				if(logic.isValid()!=r.isValid()){
+					if(r.isValid()) logic.validate(this, r);
 					else logic.invalidate(this, r);
 				}
 			}
-			if(valid) logic.update();
+			if(logic.isValid()) logic.update();
 		}
 	}
 	
@@ -87,7 +79,7 @@ public class TEMultibrick extends TELogic implements ITickable, MultiblockDebuga
 	
 	@Override
 	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState){
-		return oldState.getBlock()!=newState.getBlock()||oldState.getValue(BlockMultibrickCore.PROPERTY)!=newState.getValue(BlockMultibrickCore.PROPERTY);
+		return oldState!=newState;
 	}
 	
 	@Override
@@ -95,20 +87,15 @@ public class TEMultibrick extends TELogic implements ITickable, MultiblockDebuga
 		super.writeToNBT(nbt);
 		if(multibrick!=null){
 			nbt.setInteger("multibrick", multibrick.ordinal());
-			NBTTagCompound subnbt = logic.serializeNBT();
-			if(!subnbt.hasNoTags()) nbt.setTag("logic", subnbt);
 		}
-		if(!valid) nbt.setBoolean("invalid", true);
 		return nbt;
 	}
 	
 	@Override
 	public void readFromNBT(NBTTagCompound nbt){
-		super.readFromNBT(nbt);
 		if(nbt.hasKey("multibrick", NBTTypes.INTEGER)){
 			setMultibrick(Multibricks.fromMeta(nbt.getInteger("multibrick")));
-			logic.deserializeNBT(nbt.getCompoundTag("logic"));
 		}
-		this.valid = !nbt.getBoolean("invalid");
+		super.readFromNBT(nbt);
 	}
 }

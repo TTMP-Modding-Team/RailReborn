@@ -1,0 +1,6 @@
+{
+	"parent": "minecraft:block/block",
+	"textures": {
+		"particle": "railreborn:block/engine/hobbyist_steam.particle"
+	}
+}

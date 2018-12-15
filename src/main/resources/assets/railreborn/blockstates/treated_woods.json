@@ -1,0 +1,13 @@
+{
+	"forge_marker": 1,
+	"variants": {
+		"property": {
+			"vertical": {
+				"model": "railreborn:treated_woods_vertical"
+			},
+			"horizontal": {
+				"model": "railreborn:treated_woods_horizontal"
+			}
+		}
+	}
+}

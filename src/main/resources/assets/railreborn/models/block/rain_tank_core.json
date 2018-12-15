@@ -1,0 +1,8 @@
+{
+	"parent": "block/orientable",
+	"textures": {
+		"top": "railreborn:block/treated_woods",
+		"front": "railreborn:block/rain_tank_core",
+		"side": "railreborn:block/rain_tank"
+	}, "uvlock": true
+}
