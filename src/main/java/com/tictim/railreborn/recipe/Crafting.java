@@ -251,7 +251,11 @@ public final class Crafting implements ITickable, Debugable{
 	public int getEnergy(){
 		return this.energy;
 	}
-	
+
+	public Crafting addEnergy(int energy) {
+		this.energy = this.energy + energy;
+		return this;
+	}
 	public void cancel(){
 		this.setCurrentTime(this.totalTime);
 		setOutput().setFluidOutput();
@@ -371,7 +375,7 @@ public final class Crafting implements ITickable, Debugable{
 				FluidStack s = this.fluidInput[i];
 				if(s.amount>0){
 					FluidStack s2 = handler.drain(s, !simulate);
-					if(s.amount>s2.amount) return false;
+					if(s2 !=null) if(s.amount>s2.amount) return false;
 				}
 			}
 		}

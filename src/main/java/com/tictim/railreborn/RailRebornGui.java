@@ -1,6 +1,8 @@
 package com.tictim.railreborn;
 
+import com.tictim.railreborn.enums.Engines;
 import com.tictim.railreborn.enums.Multibricks;
+import com.tictim.railreborn.tileentity.TEEngine;
 import com.tictim.railreborn.tileentity.TEMultibrick;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
@@ -31,6 +33,40 @@ public enum RailRebornGui{
 		@Override
 		public GuiContainer getClientGuiElement(EntityPlayer player, World world, int x, int y, int z){
 			return ((TEMultibrick)world.getTileEntity(new BlockPos(x, y, z))).getGui(player, Multibricks.BLAST_FURNACE);
+		}
+
+	},
+	STEAM_ENGINE{
+		@Override
+		public Container getServerGuiElement(EntityPlayer player, World world, int x, int y, int z){
+			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getContainer(player);
+		}
+
+		@Override
+		public GuiContainer getClientGuiElement(EntityPlayer player, World world, int x, int y, int z){
+			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getGui(player);
+			}
+		},
+	HOBBYIST_ENGINE{
+		@Override
+		public Container getServerGuiElement(EntityPlayer player, World world, int x, int y, int z){
+			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getContainer(player);
+		}
+
+		@Override
+		public GuiContainer getClientGuiElement(EntityPlayer player, World world, int x, int y, int z){
+			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getGui(player);
+		}
+	},
+	DISEL_ENGINE{
+		@Override
+		public Container getServerGuiElement(EntityPlayer player, World world, int x, int y, int z){
+			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getContainer(player);
+		}
+
+		@Override
+		public GuiContainer getClientGuiElement(EntityPlayer player, World world, int x, int y, int z){
+			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getGui(player);
 		}
 	};
 	

@@ -92,7 +92,7 @@ public class LogicRainTank extends Logic{
 		tank.setCanDrain(valid);
 	}
 	
-	private final Name name = new Name(RailReborn.MODID+".coke_oven");
+	private final Name name = new Name(RailReborn.MODID+".rain_tank");
 	
 	@Override
 	public ITextComponent getDisplayName(){

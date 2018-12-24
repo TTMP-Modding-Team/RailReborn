@@ -1,5 +1,6 @@
 package com.tictim.railreborn.block;
 
+import com.tictim.railreborn.RailRebornGui;
 import com.tictim.railreborn.enums.Engines;
 import com.tictim.railreborn.tileentity.TEEngine;
 import net.minecraft.block.Block;
@@ -8,9 +9,11 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -18,6 +21,8 @@ import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidUtil;
 
 public class BlockEngine extends Block{
 	public static final PropertyEnum<State> STATE = PropertyEnum.create("state", State.class);
@@ -33,10 +38,10 @@ public class BlockEngine extends Block{
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ){
 		if(!world.isRemote){
 			TileEntity te = world.getTileEntity(pos);
-			
 			if(te instanceof TEEngine){
 				TEEngine core = (TEEngine)te;
-				if(core.isLogicValid()) engine.getGui().openGui(player, world, pos);
+				//if(core.isLogicValid()) if(!()) engine.getGui().openGui(player, world, pos);
+				FluidUtil.interactWithFluidHandler(player, hand, world, pos, facing);
 			}
 		}
 		return true;
@@ -103,7 +108,7 @@ public class BlockEngine extends Block{
 	public TileEntity createTileEntity(World world, IBlockState state){
 		return new TEEngine().setEngine(this.engine);
 	}
-	
+
 	public enum State implements IStringSerializable{
 		FLOOR,
 		WALL,
