@@ -1,4 +1,4 @@
-package com.tictim.railreborn.client.display;
+package com.tictim.railreborn.client.event;
 
 import com.tictim.railreborn.RailReborn;
 import com.tictim.railreborn.capability.Debugable;

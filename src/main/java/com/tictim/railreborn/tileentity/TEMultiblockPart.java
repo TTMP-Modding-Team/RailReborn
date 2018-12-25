@@ -6,8 +6,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.tictim.railreborn.capability.Debugable;
 import com.tictim.railreborn.multiblock.Blueprint;
+import com.tictim.railreborn.util.DataUtils;
 import com.tictim.railreborn.util.NBTTypes;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -26,14 +26,8 @@ public class TEMultiblockPart extends TileEntity implements Debugable{
 	public void setCorePos(@Nullable BlockPos pos){
 		if(!Objects.equals(pos, core)){
 			this.core = pos;
-			update(this);
+			DataUtils.updateTileEntity(this);
 		}
-	}
-	
-	// TODO Code organization
-	private static void update(TileEntity te){
-		IBlockState state = te.getWorld().getBlockState(te.getPos());
-		te.getWorld().notifyBlockUpdate(te.getPos(), state, state, 0);
 	}
 	
 	@Nullable

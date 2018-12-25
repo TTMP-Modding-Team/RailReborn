@@ -5,7 +5,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.tictim.railreborn.capability.Debugable;
-import com.tictim.railreborn.client.display.FoolsCrowbarEvent;
+import com.tictim.railreborn.client.event.FoolsCrowbarEvent;
+import com.tictim.railreborn.util.DataUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -32,7 +33,7 @@ public class MessageDebug implements IMessage{
 	
 	@Override
 	public void fromBytes(ByteBuf buf){
-		this.pos = new BlockPos(buf.readInt(), buf.readUnsignedByte(), buf.readInt());
+		this.pos = DataUtils.readBlockPos(buf);
 		byte[] b = new byte[buf.readInt()];
 		if(b.length>0){
 			buf.readBytes(b);
@@ -42,9 +43,7 @@ public class MessageDebug implements IMessage{
 	
 	@Override
 	public void toBytes(ByteBuf buf){
-		buf.writeInt(pos.getX());
-		buf.writeByte(pos.getY());
-		buf.writeInt(pos.getZ());
+		DataUtils.writeBlockPos(buf, pos);
 		byte[] b = e==null ? new byte[0] : e.toString().getBytes(Charsets.UTF_8);
 		if(b.length>0){
 			buf.writeInt(b.length);

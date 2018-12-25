@@ -1,7 +1,5 @@
 package com.tictim.railreborn.item;
 
-import static com.tictim.railreborn.item.ModItems.mrl;
-
 import com.tictim.railreborn.enums.Misc;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -10,6 +8,8 @@ import net.minecraft.util.NonNullList;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import static com.tictim.railreborn.item.ModItems.mrl;
 
 public class ItemMisc extends Item{
 	public ItemMisc(){
@@ -29,8 +29,8 @@ public class ItemMisc extends Item{
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public void registerModels(String prefix){
+	public void registerModels(){
 		for(int i = 0, j = Misc.values().length; i<j; i++)
-			ModelLoader.setCustomModelResourceLocation(this, i, mrl(Misc.fromMeta(i).toString()));
+			ModelLoader.setCustomModelResourceLocation(this, i, mrl("misc/"+Misc.fromMeta(i).toString()));
 	}
 }

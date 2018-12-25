@@ -8,6 +8,9 @@ import com.tictim.railreborn.fluid.ModFluids;
 import com.tictim.railreborn.item.ModItems;
 import com.tictim.railreborn.multiblock.Blueprints;
 import com.tictim.railreborn.network.MessageDebug;
+import com.tictim.railreborn.network.MessagePipeData;
+import com.tictim.railreborn.network.MessagePipeRequest;
+import com.tictim.railreborn.pipelink.handler.PipeHandlers;
 import com.tictim.railreborn.recipe.MachineRecipes;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Mod;
@@ -40,6 +43,7 @@ public class RailReborn{
 	public static final Logger LOGGER = LogManager.getLogger(NAME);
 	
 	{
+		PipeHandlers.INVALID.toString();
 		ModFluids.init();
 	}
 	
@@ -64,5 +68,7 @@ public class RailReborn{
 		
 		NET.registerMessage(new MessageDebug.Client(), MessageDebug.class, 0, Side.CLIENT);
 		NET.registerMessage(new MessageDebug.Server(), MessageDebug.class, 1, Side.SERVER);
+		NET.registerMessage(new MessagePipeData.Handler(), MessagePipeData.class, 2, Side.CLIENT);
+		NET.registerMessage(new MessagePipeRequest.Handler(), MessagePipeRequest.class, 3, Side.SERVER);
 	}
 }

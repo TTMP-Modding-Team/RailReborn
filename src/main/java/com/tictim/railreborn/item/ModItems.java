@@ -2,10 +2,13 @@ package com.tictim.railreborn.item;
 
 import com.tictim.railreborn.RailReborn;
 import com.tictim.railreborn.block.ModBlocks;
+import com.tictim.railreborn.client.teisr.TEISRPipe;
 import com.tictim.railreborn.config.RailRebornCfg;
 import com.tictim.railreborn.enums.*;
+import com.tictim.railreborn.pipelink.handler.PipeHandlers;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -20,6 +23,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.registries.IForgeRegistry;
+
+import static com.tictim.railreborn.block.ModBlocks.TAB_BLOCKS;
 
 @EventBusSubscriber(modid = RailReborn.MODID)
 public final class ModItems{
@@ -37,12 +42,16 @@ public final class ModItems{
 	public static final Item CROWBAR_STAINLESS = new ItemCrowbar(8, 1200, Shape.INGOT.oreName(RailRebornCfg.getStainlessName()), EnumRarity.RARE, EnumRarity.EPIC);
 	public static final Item CROWBAR_FOOL = new ItemFoolsCrowbar();
 	
-	public static final Item MISC = new ItemMisc();
+	public static final Item FOOLS_GOGGLE = new ItemFoolsArmor(EntityEquipmentSlot.HEAD);
+	
+	public static final ItemMisc MISC = new ItemMisc();
 	public static final ItemRefinedMetal IRON = new ItemRefinedMetal().setShapes(Shape.DUST, Shape.PLATE, Shape.GEAR);
 	public static final ItemRefinedMetal GOLD = new ItemRefinedMetal().setShapes(Shape.DUST, Shape.PLATE, Shape.GEAR);
 	public static final ItemRefinedMetal STEEL = new ItemRefinedMetal();
 	public static final ItemRefinedMetal STAINLESS_STEEL = new ItemRefinedMetal();
 	public static final ItemRefinedMetal CHROME = new ItemRefinedMetal().setShapes(Shape.INGOT, Shape.NUGGET, Shape.DUST);
+	
+	public static final Item PIPE_ATTACHMENTS = new Item();
 	
 	public static final Item COAL_COKE_BLOCK = new ItemBlock(ModBlocks.COAL_COKE_BLOCK);
 	public static final Item ORE_TIN = new ItemBlock(ModBlocks.ORE_TIN);
@@ -64,11 +73,15 @@ public final class ModItems{
 	public static final ItemBlockBase ENGINE_STEAM = new ItemBlockBase(ModBlocks.ENGINE_STEAM);
 	public static final ItemBlockBase ENGINE_DIESEL = new ItemBlockBase(ModBlocks.ENGINE_DIESEL);
 	
+	public static final ItemBlockBase PIPE_STUFFED = new ItemBlockBase(ModBlocks.PIPE_STUFFED);
+	
 	static{
 		CROWBAR_IRON.setRegistryName("crowbar_iron").setUnlocalizedName("crowbar_iron").setCreativeTab(TAB_ITEMS);
 		CROWBAR_STEEL.setRegistryName("crowbar_steel").setUnlocalizedName("crowbar_steel").setCreativeTab(TAB_ITEMS);
 		CROWBAR_STAINLESS.setRegistryName("crowbar_stainless").setUnlocalizedName("crowbar_stainless").setCreativeTab(TAB_ITEMS);
 		CROWBAR_FOOL.setRegistryName("crowbar_fool").setUnlocalizedName("crowbar_fool").setCreativeTab(TAB_ITEMS);
+		
+		FOOLS_GOGGLE.setRegistryName("fools_goggle").setUnlocalizedName("fools_goggle").setCreativeTab(TAB_ITEMS);
 		
 		MISC.setRegistryName("misc").setUnlocalizedName("misc").setCreativeTab(TAB_ITEMS);
 		IRON.setRegistryName("iron").setUnlocalizedName("railReborn.iron").setCreativeTab(TAB_ITEMS);
@@ -76,6 +89,8 @@ public final class ModItems{
 		STEEL.setRegistryName("steel").setUnlocalizedName("railReborn.steel").setCreativeTab(TAB_ITEMS);
 		STAINLESS_STEEL.setRegistryName("stainless_steel").setUnlocalizedName("railReborn.stainless_steel").setCreativeTab(TAB_ITEMS);
 		CHROME.setRegistryName("chrome").setUnlocalizedName("railReborn.chrome").setCreativeTab(TAB_ITEMS);
+		
+		PIPE_ATTACHMENTS.setRegistryName("pipe_attachments").setUnlocalizedName("pipe_attachments").setCreativeTab(TAB_BLOCKS);
 		
 		COAL_COKE_BLOCK.setRegistryName("coal_coke_block");
 		ORE_TIN.setRegistryName("ore_tin");
@@ -96,6 +111,8 @@ public final class ModItems{
 		ENGINE_HOBBYIST_STEAM.setRegistryName("engine.hobbyist_steam");
 		ENGINE_STEAM.setRegistryName("engine.steam");
 		ENGINE_DIESEL.setRegistryName("engine.diesel");
+		
+		PIPE_STUFFED.setRegistryName("pipe.stuffed");
 	}
 	
 	@SubscribeEvent
@@ -106,12 +123,16 @@ public final class ModItems{
 		registry.register(CROWBAR_STAINLESS);
 		registry.register(CROWBAR_FOOL);
 		
+		registry.register(FOOLS_GOGGLE);
+		
 		registry.register(MISC);
 		registry.register(IRON);
 		registry.register(GOLD);
 		registry.register(STEEL);
 		registry.register(STAINLESS_STEEL);
 		registry.register(CHROME);
+		
+		registry.register(PIPE_ATTACHMENTS);
 		
 		registry.register(COAL_COKE_BLOCK);
 		registry.register(ORE_TIN);
@@ -132,6 +153,8 @@ public final class ModItems{
 		registry.register(ENGINE_HOBBYIST_STEAM);
 		registry.register(ENGINE_STEAM);
 		registry.register(ENGINE_DIESEL);
+		
+		registry.register(PIPE_STUFFED);
 	}
 	
 	public static void registerOreDict(){
@@ -164,8 +187,9 @@ public final class ModItems{
 		registerByDefault(CROWBAR_STAINLESS);
 		registerByDefault(CROWBAR_FOOL);
 		
-		for(Misc m: Misc.values())
-			ModelLoader.setCustomModelResourceLocation(MISC, m.ordinal(), mrl("misc/"+m.name().toLowerCase()));
+		registerByDefault(FOOLS_GOGGLE);
+		
+		MISC.registerModels();
 		IRON.registerModels("iron");
 		GOLD.registerModels("gold");
 		STEEL.registerModels("steel");
@@ -191,6 +215,10 @@ public final class ModItems{
 		ModelLoader.setCustomModelResourceLocation(ENGINE_HOBBYIST_STEAM, 0, mrl("engine/hobbyist_steam"));
 		ModelLoader.setCustomModelResourceLocation(ENGINE_STEAM, 0, mrl("engine/steam"));
 		ModelLoader.setCustomModelResourceLocation(ENGINE_DIESEL, 0, mrl("engine/diesel"));
+		
+		ModelLoader.setCustomModelResourceLocation(PIPE_STUFFED, 0, mrl("pipe"));
+		
+		PIPE_STUFFED.setTileEntityItemStackRenderer(new TEISRPipe(PipeHandlers.STUFFED));
 	}
 	
 	@SideOnly(Side.CLIENT)

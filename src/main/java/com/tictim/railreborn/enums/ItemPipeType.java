@@ -3,7 +3,7 @@ package com.tictim.railreborn.enums;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 
-public enum PipeType{
+public enum ItemPipeType{
 	STONE_40CM(PipeIngr.STONE, 40),
 	STONE_60CM(PipeIngr.STONE, 60),
 	TREATED_40CM(PipeIngr.TREATED_WOOD, 40),
@@ -21,7 +21,7 @@ public enum PipeType{
 	private final PipeIngr ingredient;
 	private final int diameter;
 	
-	PipeType(PipeIngr i, int diameter){
+	ItemPipeType(PipeIngr i, int diameter){
 		this.ingredient = i;
 		this.diameter = diameter;
 	}
@@ -38,7 +38,7 @@ public enum PipeType{
 		return diameter*diameter;
 	}
 	
-	public static enum PipeIngr{
+	public enum PipeIngr{
 		STONE(Material.ROCK, SoundType.STONE, true, false, 0.9, 1.1, 1),
 		TREATED_WOOD(Material.WOOD, SoundType.WOOD, false, true, 0.9, 1.1, 2),
 		IRON(Material.IRON, SoundType.METAL, false, true, 0.7, 1.5, 4),
