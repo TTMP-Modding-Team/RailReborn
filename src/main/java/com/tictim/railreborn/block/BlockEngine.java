@@ -14,6 +14,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -22,6 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 
 public class BlockEngine extends Block{
@@ -40,8 +42,16 @@ public class BlockEngine extends Block{
 			TileEntity te = world.getTileEntity(pos);
 			if(te instanceof TEEngine){
 				TEEngine core = (TEEngine)te;
-				//if(core.isLogicValid()) if(!()) engine.getGui().openGui(player, world, pos);
-				FluidUtil.interactWithFluidHandler(player, hand, world, pos, facing);
+				if (player.getHeldItemMainhand() != null) {
+					ItemStack itemStack = player.getHeldItemMainhand();
+					FluidStack fluidStack = FluidUtil.getFluidContained(itemStack);
+					if (fluidStack != null) {
+						FluidUtil.getFluidHandler(itemStack).drain(fluidStack.amount, true);
+						core.fillTank(fluidStack);
+						player.setHeldItem(hand, FluidUtil.getFluidHandler(itemStack).getContainer());
+					}
+
+				}
 			}
 		}
 		return true;

@@ -4,12 +4,18 @@ import com.tictim.railreborn.api.RJ;
 import com.tictim.railreborn.enums.Engines;
 import com.tictim.railreborn.enums.Multibricks;
 import com.tictim.railreborn.logic.Logic;
+import com.tictim.railreborn.logic.LogicSteamEngine;
+import com.tictim.railreborn.util.NBTTypes;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -28,9 +34,7 @@ public class TEEngine extends TELogic implements ITickable{
 		this.resetLogic();
 		return this;
 	}
-	public void addFluid() {
-		//for debu
-	}
+
 	@Nullable
 	@Override
 	protected Logic createNewLogic(){
@@ -54,6 +58,33 @@ public class TEEngine extends TELogic implements ITickable{
 				logic.update();
 			}
 		}
+	}
+
+	public void fillTank(FluidStack fluidStack) {
+		LogicSteamEngine logic = (LogicSteamEngine) this.logic;
+		logic.fillTank(fluidStack);
+	}
+
+	@Override
+	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState){
+		return oldState.getBlock()!=newState.getBlock();
+	}
+
+	@Override
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt){
+		super.writeToNBT(nbt);
+		if(engine!=null){
+			nbt.setInteger("engine", engine.ordinal());
+		}
+		return nbt;
+	}
+
+	@Override
+	public void readFromNBT(NBTTagCompound nbt){
+		if(nbt.hasKey("engine", NBTTypes.INTEGER)){
+			setEngine(Engines.fromMeta(nbt.getInteger("engine")));
+		}
+		super.readFromNBT(nbt);
 	}
 
 }
