@@ -1,18 +1,15 @@
 package com.tictim.railreborn.logic;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.tictim.railreborn.RailReborn;
-import com.tictim.railreborn.capability.Debugable;
 import com.tictim.railreborn.fluid.FluidWrapper;
 import com.tictim.railreborn.fluid.ModFluids;
+import com.tictim.railreborn.inventory.Inventory;
 import com.tictim.railreborn.util.NBTTypes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -20,13 +17,13 @@ import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
 
-public class LogicSteamEngine extends LogicEngine{
+public class LogicEngineSteam extends LogicEngine{
 	public FluidTank tank = new FluidTank(16000);
 
 	@Override
 	public void update(){
-			if(!(this.tank.getFluidAmount() == 0) && !(currentRJ() == capacityRJ())) {
-				generateRJ(20);
+			if(!(this.tank.getFluidAmount() == 0) && !isRJFull()) {
+				generateRJfromFluid(20, ModFluids.STEAM);
 			}
 	}
 	
@@ -60,11 +57,13 @@ public class LogicSteamEngine extends LogicEngine{
 	}
 
 	@Override
-	public JsonElement getDebugInfo(){
-		JsonObject obj = new JsonObject();
-		obj.add("Fluid Tank", Debugable.debugFluidTank(this.tank));
-		obj.addProperty("currentRJ", currentRJ());
-		return Debugable.stateClassType(this.getClass(), obj);
+	public FluidTank getTank() {
+		return this.tank;
+	}
+
+	@Override
+	public Inventory getInventory() {
+		return null;
 	}
 	
 	@Override
@@ -102,12 +101,4 @@ public class LogicSteamEngine extends LogicEngine{
 		return 300;
 	}
 
-	public void fillTank(FluidStack fluidstack) {
-		this.tank.fill(fluidstack, true);
-	}
-
-	public void generateRJ(long amount) {
-		this.tank.setFluid(new FluidStack(ModFluids.STEAM, this.tank.getFluidAmount() - 1));
-		this.insertRJ(amount, false, false);
-	}
 }

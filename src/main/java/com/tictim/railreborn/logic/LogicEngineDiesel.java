@@ -4,10 +4,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.tictim.railreborn.RailReborn;
 import com.tictim.railreborn.capability.Debugable;
-import com.tictim.railreborn.client.gui.GuiHobbyistEngine;
 import com.tictim.railreborn.client.gui.GuiSteamEngine;
 import com.tictim.railreborn.fluid.FluidWrapper;
-import com.tictim.railreborn.inventory.ContainerHobbyistEngine;
+import com.tictim.railreborn.fluid.ModFluids;
 import com.tictim.railreborn.inventory.ContainerSteamEngine;
 import com.tictim.railreborn.inventory.Inventory;
 import com.tictim.railreborn.inventory.InventoryBuilder;
@@ -38,40 +37,25 @@ import net.minecraftforge.items.wrapper.RangedWrapper;
 
 import javax.annotation.Nullable;
 
-public class LogicHobbyistEngine extends Logic implements InventoryBuilder, Machine, SidedItemHandlerFactory, AccessValidator, FieldHandler{
+public class LogicEngineDiesel extends LogicEngine implements InventoryBuilder, SidedItemHandlerFactory, FieldHandler{
 	private final Inventory inv = this.createInventory();
 	private final FluidTank tank = new FluidTank(16000);
-	@Nullable
-	private Crafting crafting;
-
-	{
-		resetTank();
-	}
 	
 	@Override
 	public void update(){
-		if(crafting!=null) crafting.update();
-		else if(!inv.getStackInSlot(0).isEmpty()){
-			crafting = MachineRecipes.COKE_OVEN.getCrafting(this);
-			if(crafting!=null&&!crafting.extractInput(this.inputSlotHandler(), false)) crafting = null;
-		}
+		generateRJfromFluid(20, ModFluids.DIESEL);
 	}
 
 	@Override
-	protected void onValidate(TileEntity te, @Nullable TestResult multiblockTest){
-		resetTank();
+	public FluidTank getTank() {
+		return this.tank;
 	}
 
 	@Override
-	protected void onInvalidate(TileEntity te, @Nullable TestResult multiblockTest){
-		if(crafting!=null){
-			crafting.cancel();
-			crafting = null;
-		}
-		InventoryHelper.dropInventoryItems(te.getWorld(), te.getPos(), inv);
-		resetTank();
+	public Inventory getInventory() {
+		return this.inv;
 	}
-	
+
 	@Override
 	public NBTTagCompound serializeNBT(){
 		NBTTagCompound nbt = super.serializeNBT();
@@ -83,7 +67,10 @@ public class LogicHobbyistEngine extends Logic implements InventoryBuilder, Mach
 			NBTTagCompound subnbt = tank.writeToNBT(new NBTTagCompound());
 			if(!subnbt.hasNoTags()) nbt.setTag("fluidTank", subnbt);
 		}
-		if(crafting!=null) nbt.setTag("crafting", crafting.serializeNBT());
+		if(this.capacity>0) nbt.setLong("max", this.capacity);
+		if(this.current>0) nbt.setLong("current", this.current);
+		if(this.in>0) nbt.setLong("in", this.in);
+		if(this.out>0) nbt.setLong("out", this.out);
 		return nbt;
 	}
 	
@@ -92,15 +79,12 @@ public class LogicHobbyistEngine extends Logic implements InventoryBuilder, Mach
 		super.deserializeNBT(nbt);
 		if(nbt.hasKey("inventory", NBTTypes.COMPOUND)) inv.deserializeNBT(nbt.getCompoundTag("inventory"));
 		if(nbt.hasKey("fluidTank", NBTTypes.COMPOUND)) tank.readFromNBT(nbt.getCompoundTag("fluidTank"));
-		crafting = nbt.hasKey("crafting", NBTTypes.COMPOUND) ? new Crafting(this).read(nbt.getCompoundTag("crafting")) : null;
-		resetTank();
+		this.capacity = nbt.getLong("max");
+		this.current = nbt.getLong("current");
+		this.in = nbt.getLong("in");
+		this.out = nbt.getLong("out");
 	}
-	
-	private void resetTank(){
-		tank.setCanFill(valid);
-		tank.setCanDrain(valid);
-	}
-	
+
 	@Override
 	public int size(){
 		return 2;
@@ -108,49 +92,11 @@ public class LogicHobbyistEngine extends Logic implements InventoryBuilder, Mach
 	
 	@Override
 	public String invName(){
-		return RailReborn.MODID+".steam_engine";
-	}
-
-	@Override
-	public boolean interact(Crafting c){
-		return true;
-	}
-
-	@Override
-	public boolean process(Crafting c){
-		return true;
-	}
-
-	@Override
-	public void collectResult(Crafting c){
-		c.insertOutput(this.outputSlotHandler(), false);
-		c.insertFluidOutput(this.outputFluidHandler(), false);
-	}
-
-	@Override
-	public void finalize(Crafting c){
-		crafting = null;
+		return RailReborn.MODID+".diesel_engine";
 	}
 
 	private IItemHandler inputSlotHandler, outputSlotHandler;
-	
-	@Override
-	public IItemHandler inputSlotHandler(){
-		if(inputSlotHandler==null) inputSlotHandler = new RangedWrapper(inv, 0, 1);
-		return inputSlotHandler;
-	}
-	
-	@Override
-	public IItemHandler outputSlotHandler(){
-		if(outputSlotHandler==null) outputSlotHandler = new RangedWrapper(inv, 1, 2);
-		return outputSlotHandler;
-	}
-	
-	@Override
-	public IFluidHandler outputFluidHandler(){
-		return tank;
-	}
-	
+
 	@Override
 	public boolean canInsertItem(IInventory inv, int index, ItemStack stack, EnumFacing direction){
 		return index==0&&inv.isItemValidForSlot(index, stack);
@@ -162,38 +108,23 @@ public class LogicHobbyistEngine extends Logic implements InventoryBuilder, Mach
 	}
 	
 	@Override
-	public boolean isItemValidForSlot(int index, ItemStack stack){
-		return index!=0||MachineRecipes.COKE_OVEN.getCrafting(stack)!=null;
-	}
-	
-	@Override
-	public ContainerHobbyistEngine getContainer(TileEntity te, EntityPlayer player){
-		return new ContainerHobbyistEngine(te, this, this.inv, player);
+	public ContainerSteamEngine getContainer(TileEntity te, EntityPlayer player){
+		return new ContainerSteamEngine(te, this, this.inv, player);
 	}
 	
 	@Override
 	public GuiContainer getGui(TileEntity te, EntityPlayer player){
-		return new GuiHobbyistEngine(getContainer(te, player));
+		return new GuiSteamEngine(getContainer(te, player));
 	}
 	
 	@Override
 	public ITextComponent getDisplayName(){
 		return this.inv.getDisplayName();
 	}
-	
-	@Nullable
-	@Override
-	public Crafting getCrafting(int idx){
-		return this.crafting;
-	}
-	
+
 	@Override
 	public int getField(int id){
 		switch(id){
-			case 0:
-				return this.crafting==null ? 0 : this.crafting.getCurrentTime();
-			case 1:
-				return this.crafting==null ? 0 : this.crafting.getTotalTime();
 			default:
 				throw new IllegalArgumentException("id: "+id);
 		}
@@ -202,18 +133,6 @@ public class LogicHobbyistEngine extends Logic implements InventoryBuilder, Mach
 	@Override
 	public void setField(int id, int value){
 		switch(id){
-			case 0:
-				if(this.crafting==null) this.crafting = new Crafting(this);
-				this.crafting.setCurrentTime(value);
-				break;
-			case 1:
-				if(value<=0){
-					this.crafting = null;
-				}else{
-					if(this.crafting==null) this.crafting = new Crafting(this);
-					this.crafting.setTotalTime(value);
-				}
-				break;
 			default:
 				throw new IllegalArgumentException("id: "+id);
 		}
@@ -221,16 +140,7 @@ public class LogicHobbyistEngine extends Logic implements InventoryBuilder, Mach
 	
 	@Override
 	public int getFieldCount(){
-		return 2;
-	}
-	
-	@Override
-	public JsonElement getDebugInfo(){
-		JsonObject obj = new JsonObject();
-		obj.add("Inventory", this.inv.getDebugInfo());
-		obj.add("Fluid Tank", Debugable.debugFluidTank(this.tank));
-		if(this.crafting!=null) obj.add("Crafting", this.crafting.getDebugInfo());
-		return Debugable.stateClassType(this.getClass(), obj);
+		return 0;
 	}
 	
 	@Override
@@ -253,5 +163,20 @@ public class LogicHobbyistEngine extends Logic implements InventoryBuilder, Mach
 			if(tankCapability==null) tankCapability = new FluidWrapper(tank, false, true);
 			return (T)tankCapability;
 		}else return super.getCapability(cap, facing);
+	}
+
+	@Override
+	public long capacityRJ(){
+		return 2000;
+	}
+
+	@Override
+	public long maxRJIn(){
+		return 30;
+	}
+
+	@Override
+	public long maxRJOut(){
+		return 30;
 	}
 }

@@ -4,7 +4,7 @@ import com.tictim.railreborn.api.RJ;
 import com.tictim.railreborn.enums.Engines;
 import com.tictim.railreborn.enums.Multibricks;
 import com.tictim.railreborn.logic.Logic;
-import com.tictim.railreborn.logic.LogicSteamEngine;
+import com.tictim.railreborn.logic.LogicEngine;
 import com.tictim.railreborn.util.NBTTypes;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -61,8 +61,8 @@ public class TEEngine extends TELogic implements ITickable{
 	}
 
 	public void fillTank(FluidStack fluidStack) {
-		LogicSteamEngine logic = (LogicSteamEngine) this.logic;
-		logic.fillTank(fluidStack);
+		LogicEngine logicengine = (LogicEngine) logic;
+		logicengine.fillTank(fluidStack);
 	}
 
 	@Override

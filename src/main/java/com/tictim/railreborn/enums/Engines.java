@@ -1,7 +1,6 @@
 package com.tictim.railreborn.enums;
 
 import com.tictim.railreborn.RailRebornGui;
-import com.tictim.railreborn.client.gui.GuiSteamEngine;
 import com.tictim.railreborn.logic.*;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.MathHelper;
@@ -20,11 +19,11 @@ public enum Engines implements IStringSerializable{
 	public Logic createLogic(){
 		switch(this) {
 			case DIESEL:
-				return new LogicDiselEngine();
+				return new LogicEngineDiesel();
 			case STEAM:
-				return new LogicSteamEngine();
+				return new LogicEngineSteam();
 			case HOBBYIST_STEAM:
-				return new LogicHobbyistEngine();
+				return new LogicEngineHobbyist();
 			default:
 				return new LogicRedstoneEngine();
 		}
