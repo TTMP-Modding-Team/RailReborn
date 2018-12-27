@@ -2,6 +2,7 @@ package com.tictim.railreborn.item;
 
 import com.tictim.railreborn.RailReborn;
 import com.tictim.railreborn.block.ModBlocks;
+import com.tictim.railreborn.client.teisr.TEISREngine;
 import com.tictim.railreborn.config.RailRebornCfg;
 import com.tictim.railreborn.enums.*;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -191,6 +192,11 @@ public final class ModItems{
 		ModelLoader.setCustomModelResourceLocation(ENGINE_HOBBYIST_STEAM, 0, mrl("engine/hobbyist_steam"));
 		ModelLoader.setCustomModelResourceLocation(ENGINE_STEAM, 0, mrl("engine/steam"));
 		ModelLoader.setCustomModelResourceLocation(ENGINE_DIESEL, 0, mrl("engine/diesel"));
+		
+		ENGINE_REDSTONE_REPEATER.setTileEntityItemStackRenderer(new TEISREngine(Engines.REDSTONE_REPEATER));
+		ENGINE_HOBBYIST_STEAM.setTileEntityItemStackRenderer(new TEISREngine(Engines.HOBBYIST_STEAM));
+		ENGINE_STEAM.setTileEntityItemStackRenderer(new TEISREngine(Engines.STEAM));
+		ENGINE_DIESEL.setTileEntityItemStackRenderer(new TEISREngine(Engines.DIESEL));
 	}
 	
 	@SideOnly(Side.CLIENT)

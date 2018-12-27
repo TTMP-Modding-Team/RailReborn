@@ -43,7 +43,7 @@ public final class ModBlocks{
 	public static final Block BLAST_FURNACE_PART = new BlockMultiblockPart(Material.ROCK, SoundType.STONE);
 	public static final Block RAIN_TANK_PART = new BlockMultiblockPart(Material.WOOD, SoundType.WOOD);
 	
-	public static final Block ENGINE_REDSTONE_REPEATER = new BlockEngine(Engines.REDSTONE_REPEATER);
+	public static final Block ENGINE_REDSTONE_REPEATER = new BlockEngineRedstone();
 	public static final Block ENGINE_HOBBYIST_STEAM = new BlockEngine(Engines.HOBBYIST_STEAM);
 	public static final Block ENGINE_STEAM = new BlockEngine(Engines.STEAM);
 	public static final Block ENGINE_DIESEL = new BlockEngine(Engines.DIESEL);

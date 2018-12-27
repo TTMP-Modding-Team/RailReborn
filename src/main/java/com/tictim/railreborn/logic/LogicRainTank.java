@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.tictim.railreborn.RailReborn;
 import com.tictim.railreborn.capability.Debugable;
+import com.tictim.railreborn.fluid.TypedFluidTank;
 import com.tictim.railreborn.inventory.Inventory.Name;
 import com.tictim.railreborn.multiblock.Blueprint;
 import com.tictim.railreborn.tileentity.TEMultiblockPart;
@@ -22,17 +23,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import javax.annotation.Nullable;
 
 public class LogicRainTank extends Logic{
-	private final FluidTank tank = new FluidTank(8000){
-		@Override
-		public boolean canFillFluidType(FluidStack fluid){
-			return super.canFillFluidType(fluid)&&fluid.getFluid()==FluidRegistry.WATER;
-		}
-		
-		@Override
-		public boolean canDrainFluidType(@Nullable FluidStack fluid){
-			return super.canDrainFluidType(fluid)&&fluid.getFluid()==FluidRegistry.WATER;
-		}
-	};
+	private final FluidTank tank = new TypedFluidTank(FluidRegistry.WATER, 8000);
 	
 	{
 		resetTank();

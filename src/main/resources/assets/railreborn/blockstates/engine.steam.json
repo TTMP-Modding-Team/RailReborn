@@ -1,17 +1,16 @@
 {
-	"forge_marker": 1,
-	"defaults": {
-		"model": "railreborn:engine/steam"
-	}, "variants": {
-		"facing": {
-			"north": { },
-			"south": { },
-			"east": { },
-			"west": { }
-		}, "state": {
-			"ceiling": { },
-			"floor": { },
-			"wall": { }
-		}
+	"variants": {
+		"facing=north,state=floor":  { "model": "railreborn:engine/steam" },
+		"facing=east,state=floor":  { "model": "railreborn:engine/steam", "y": 90 },
+		"facing=south,state=floor":  { "model": "railreborn:engine/steam", "y": 180 },
+		"facing=west,state=floor":  { "model": "railreborn:engine/steam", "y": 270 },
+		"facing=north,state=wall":  { "model": "railreborn:engine/steam", "x": 90 },
+		"facing=east,state=wall":  { "model": "railreborn:engine/steam", "y": 90, "x": 90 },
+		"facing=south,state=wall":  { "model": "railreborn:engine/steam", "y": 180, "x": 90 },
+		"facing=west,state=wall":  { "model": "railreborn:engine/steam", "y": 270, "x": 90 },
+		"facing=north,state=ceiling":  { "model": "railreborn:engine/steam", "x": 180 },
+		"facing=east,state=ceiling":  { "model": "railreborn:engine/steam", "y": 90, "x": 180 },
+		"facing=south,state=ceiling":  { "model": "railreborn:engine/steam", "y": 180, "x": 180 },
+		"facing=west,state=ceiling":  { "model": "railreborn:engine/steam", "y": 270, "x": 180 }
 	}
 }

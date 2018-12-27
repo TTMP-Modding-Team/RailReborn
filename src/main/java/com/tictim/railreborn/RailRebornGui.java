@@ -34,39 +34,39 @@ public enum RailRebornGui{
 		public GuiContainer getClientGuiElement(EntityPlayer player, World world, int x, int y, int z){
 			return ((TEMultibrick)world.getTileEntity(new BlockPos(x, y, z))).getGui(player, Multibricks.BLAST_FURNACE);
 		}
-
+		
 	},
-	STEAM_ENGINE{
+	ENGINE_HOBBYIST_STEAM{
 		@Override
 		public Container getServerGuiElement(EntityPlayer player, World world, int x, int y, int z){
-			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getContainer(player);
+			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getContainer(player, Engines.HOBBYIST_STEAM);
 		}
-
+		
 		@Override
 		public GuiContainer getClientGuiElement(EntityPlayer player, World world, int x, int y, int z){
-			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getGui(player);
-			}
-		},
-	HOBBYIST_ENGINE{
-		@Override
-		public Container getServerGuiElement(EntityPlayer player, World world, int x, int y, int z){
-			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getContainer(player);
-		}
-
-		@Override
-		public GuiContainer getClientGuiElement(EntityPlayer player, World world, int x, int y, int z){
-			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getGui(player);
+			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getGui(player, Engines.HOBBYIST_STEAM);
 		}
 	},
-	DISEL_ENGINE{
+	ENGINE_STEAM{
 		@Override
 		public Container getServerGuiElement(EntityPlayer player, World world, int x, int y, int z){
-			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getContainer(player);
+			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getContainer(player, Engines.STEAM);
 		}
-
+		
 		@Override
 		public GuiContainer getClientGuiElement(EntityPlayer player, World world, int x, int y, int z){
-			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getGui(player);
+			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getGui(player, Engines.STEAM);
+		}
+	},
+	ENGINE_DIESEL{
+		@Override
+		public Container getServerGuiElement(EntityPlayer player, World world, int x, int y, int z){
+			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getContainer(player, Engines.DIESEL);
+		}
+		
+		@Override
+		public GuiContainer getClientGuiElement(EntityPlayer player, World world, int x, int y, int z){
+			return ((TEEngine)world.getTileEntity(new BlockPos(x, y, z))).getGui(player, Engines.DIESEL);
 		}
 	};
 	

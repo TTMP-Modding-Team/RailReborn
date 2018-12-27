@@ -215,6 +215,8 @@ public abstract class Inventory implements IInventory, IItemHandlerModifiable, I
 	}
 	
 	public static final class Name implements IWorldNameable, INBTSerializable<NBTTagCompound>{
+		private final String initialText;
+		private final boolean initialTranslate;
 		private String text;
 		private boolean translate;
 		private boolean disableSave;
@@ -228,7 +230,10 @@ public abstract class Inventory implements IInventory, IItemHandlerModifiable, I
 		}
 		
 		public Name(String text, boolean translate){
+			Validate.notNull(text);
 			set(text, translate);
+			this.initialText = text;
+			this.initialTranslate = translate;
 		}
 		
 		public void set(Name name){
@@ -275,7 +280,7 @@ public abstract class Inventory implements IInventory, IItemHandlerModifiable, I
 		@Override
 		public NBTTagCompound serializeNBT(){
 			NBTTagCompound nbt = new NBTTagCompound();
-			if(!disableSave&&!text.isEmpty()){
+			if(!disableSave&&(!initialText.equals(text)||initialTranslate!=translate)){
 				nbt.setString("text", text);
 				if(translate) nbt.setBoolean("translate", true);
 			}
@@ -284,8 +289,10 @@ public abstract class Inventory implements IInventory, IItemHandlerModifiable, I
 		
 		@Override
 		public void deserializeNBT(NBTTagCompound nbt){
-			text = nbt.getString("text");
-			translate = nbt.getBoolean("translate");
+			if(nbt.hasKey("text", NBTTypes.STRING)){
+				text = nbt.getString("text");
+				translate = nbt.getBoolean("translate");
+			}
 		}
 	}
 }

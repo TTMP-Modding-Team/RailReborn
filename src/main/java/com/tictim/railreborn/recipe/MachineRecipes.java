@@ -6,7 +6,6 @@ import com.tictim.railreborn.fluid.ModFluids;
 import com.tictim.railreborn.item.IngredientStack;
 import com.tictim.railreborn.item.ModItems;
 import net.minecraft.init.Items;
-import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -91,11 +90,10 @@ public enum MachineRecipes implements MachineRecipe{
 	
 	public static final MachineRecipeList COKE_OVEN = new MachineRecipeList("coke_oven", new RecipeExpect().setInputSize(1).setOutputSize(1).setFluidInputSize(0).setFluidOutputSize(0, 1));
 	public static final MachineRecipeList BLAST_FURNACE = new MachineRecipeList("blast_furnace", new RecipeExpect().setInputSize(1, 1).setOutputSize(1).setFluidInputSize(0).setFluidOutputSize(0));
-	public static final MachineRecipeList ENGINE = new MachineRecipeList("engine", new RecipeExpect().setInputSize(0).setOutputSize(0).setFluidInputSize(1).setFluidOutputSize(0));
+	
 	public static void addMachineRecipes(){
 		INSTANCE.addRecipe(COKE_OVEN);
 		INSTANCE.addRecipe(BLAST_FURNACE);
-		INSTANCE.addRecipe(ENGINE);
 		
 		COKE_OVEN.addRecipe(new SimpleMachineRecipe(new Crafting(DummyCraftingHandler.INSTANCE).setRecipeKey("coke")//
 				.setInput(new IngredientStack(new ItemStack(Items.COAL)))//
@@ -121,12 +119,5 @@ public enum MachineRecipes implements MachineRecipe{
 				.setInput(new IngredientStack("ingotIron"), new IngredientStack("fuelCoke"))//
 				.setOutput(ModItems.STEEL.of(Shape.INGOT))//
 				.setTotalTime(2560)));
-
-		ENGINE.addRecipe(new SimpleMachineRecipe(new Crafting(DummyCraftingHandler.INSTANCE).setRecipeKey("creatingrj")
-		.setFluidOutput(new FluidStack(ModFluids.STEAM, 1))
-		.setTotalTime(20)
-		.setInput(new IngredientStack(ItemBucket.getItemFromBlock(ModFluids.STEAM.getBlock())))));
-
-
 	}
 }

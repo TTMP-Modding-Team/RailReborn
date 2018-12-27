@@ -1,17 +1,16 @@
 package com.tictim.railreborn.client.gui;
 
 import com.tictim.railreborn.RailReborn;
-import com.tictim.railreborn.inventory.ContainerHobbyistEngine;
-import com.tictim.railreborn.inventory.ContainerSteamEngine;
+import com.tictim.railreborn.inventory.ContainerEngineHobbyistSteam;
 import com.tictim.railreborn.recipe.Crafting;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.util.ResourceLocation;
 
-public class GuiHobbyistEngine extends GuiContainer{
+public class GuiEngineHobbyistSteam extends GuiContainer{
 	private static final ResourceLocation TEXTURE = new ResourceLocation(RailReborn.MODID, "textures/gui/coke_oven.png");
-	private final ContainerHobbyistEngine container;
+	private final ContainerEngineHobbyistSteam container;
 
-	public GuiHobbyistEngine(ContainerHobbyistEngine container){
+	public GuiEngineHobbyistSteam(ContainerEngineHobbyistSteam container){
 		super(container);
 		this.container = container;
 		this.ySize = 168;

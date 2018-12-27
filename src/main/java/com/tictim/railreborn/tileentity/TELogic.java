@@ -53,15 +53,23 @@ public abstract class TELogic extends TileEntity implements Debugable{
 	@Override
 	public boolean hasCapability(Capability<?> cap, EnumFacing facing){
 		if(cap==Debugable.CAP) return true;
-		return logic!=null&&logic.hasCapability(cap, facing)||super.hasCapability(cap, facing);
+		return (logic!=null&&hasLogicCapability(cap, facing))||super.hasCapability(cap, facing);
+	}
+	
+	protected boolean hasLogicCapability(Capability<?> cap, EnumFacing facing){
+		return logic.hasCapability(cap, facing);
 	}
 	
 	@Override
 	@Nullable
 	public <T> T getCapability(Capability<T> cap, EnumFacing facing){
 		if(cap==Debugable.CAP) return (T)this;
-		T t = logic!=null ? logic.getCapability(cap, facing) : null;
+		T t = logic!=null ? getLogicCapability(cap, facing) : null;
 		return t!=null ? t : super.getCapability(cap, facing);
+	}
+	
+	protected <T> T getLogicCapability(Capability<T> cap, EnumFacing facing){
+		return logic.getCapability(cap, facing);
 	}
 	
 	@Override

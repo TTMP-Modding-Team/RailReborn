@@ -4,46 +4,62 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.tictim.railreborn.RailReborn;
 import com.tictim.railreborn.capability.Debugable;
-import com.tictim.railreborn.client.gui.GuiHobbyistEngine;
-import com.tictim.railreborn.client.gui.GuiSteamEngine;
-import com.tictim.railreborn.fluid.FluidWrapper;
-import com.tictim.railreborn.inventory.ContainerHobbyistEngine;
-import com.tictim.railreborn.inventory.ContainerSteamEngine;
+import com.tictim.railreborn.client.gui.GuiEngineHobbyistSteam;
+import com.tictim.railreborn.enums.Engines;
+import com.tictim.railreborn.fluid.ModFluids;
+import com.tictim.railreborn.fluid.TypedFluidTank;
+import com.tictim.railreborn.inventory.ContainerEngineHobbyistSteam;
 import com.tictim.railreborn.inventory.Inventory;
 import com.tictim.railreborn.inventory.InventoryBuilder;
 import com.tictim.railreborn.inventory.InventoryBuilder.AccessValidator;
 import com.tictim.railreborn.inventory.InventoryBuilder.FieldHandler;
-import com.tictim.railreborn.inventory.InventoryBuilder.SidedItemHandlerFactory;
-import com.tictim.railreborn.multiblock.Blueprint.TestResult;
-import com.tictim.railreborn.recipe.Crafting;
-import com.tictim.railreborn.recipe.Machine;
-import com.tictim.railreborn.recipe.MachineRecipes;
 import com.tictim.railreborn.util.NBTTypes;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.templates.FluidHandlerFluidMap;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.RangedWrapper;
 
 import javax.annotation.Nullable;
 
-public class LogicEngineHobbyist extends LogicEngine implements InventoryBuilder, SidedItemHandlerFactory, AccessValidator, FieldHandler{
+public class LogicEngineHobbyistSteam extends LogicEngineFluid implements InventoryBuilder, AccessValidator, FieldHandler{
 	private final Inventory inv = this.createInventory();
-	private final FluidTank tank = new FluidTank(16000);
+	private final FluidTank waterTank = new TypedFluidTank(FluidRegistry.WATER, 4000);
+	
+	{
+		waterTank.setCanDrain(false);
+	}
 	
 	@Override
-	public void update(){	}
+	protected FluidTank createFluidTank(){
+		return new TypedFluidTank(ModFluids.STEAM, 12000);
+	}
+	
+	@Override
+	protected int fuelTime(){
+		return 100;
+	}
+	
+	@Override
+	protected Engines getEngineType(){
+		return Engines.HOBBYIST_STEAM;
+	}
+	
+	@Override
+	public void update(){
+		//TODO burn fuels, make steam
+		super.update();
+	}
 	
 	@Override
 	public NBTTagCompound serializeNBT(){
@@ -53,13 +69,9 @@ public class LogicEngineHobbyist extends LogicEngine implements InventoryBuilder
 			if(!subnbt.hasNoTags()) nbt.setTag("inventory", subnbt);
 		}
 		{
-			NBTTagCompound subnbt = tank.writeToNBT(new NBTTagCompound());
-			if(!subnbt.hasNoTags()) nbt.setTag("fluidTank", subnbt);
+			NBTTagCompound subnbt = waterTank.writeToNBT(new NBTTagCompound());
+			if(!subnbt.hasNoTags()) nbt.setTag("waterTank", subnbt);
 		}
-		if(this.capacity>0) nbt.setLong("max", this.capacity);
-		if(this.current>0) nbt.setLong("current", this.current);
-		if(this.in>0) nbt.setLong("in", this.in);
-		if(this.out>0) nbt.setLong("out", this.out);
 		return nbt;
 	}
 	
@@ -67,48 +79,33 @@ public class LogicEngineHobbyist extends LogicEngine implements InventoryBuilder
 	public void deserializeNBT(NBTTagCompound nbt){
 		super.deserializeNBT(nbt);
 		if(nbt.hasKey("inventory", NBTTypes.COMPOUND)) inv.deserializeNBT(nbt.getCompoundTag("inventory"));
-		if(nbt.hasKey("fluidTank", NBTTypes.COMPOUND)) tank.readFromNBT(nbt.getCompoundTag("fluidTank"));
-		this.capacity = nbt.getLong("max");
-		this.current = nbt.getLong("current");
-		this.in = nbt.getLong("in");
-		this.out = nbt.getLong("out");
+		if(nbt.hasKey("waterTank", NBTTypes.COMPOUND)) waterTank.readFromNBT(nbt.getCompoundTag("waterTank"));
+		
 	}
-
+	
 	@Override
 	public int size(){
-		return 2;
+		return 1;
 	}
 	
 	@Override
 	public String invName(){
-		return RailReborn.MODID+".hobbyist_engine";
-	}
-
-	private IItemHandler inputSlotHandler, outputSlotHandler;
-
-	@Override
-	public boolean canInsertItem(IInventory inv, int index, ItemStack stack, EnumFacing direction){
-		return index==0&&inv.isItemValidForSlot(index, stack);
-	}
-	
-	@Override
-	public boolean canExtractItem(IInventory inv, int index, ItemStack stack, EnumFacing direction){
-		return index==1;
+		return RailReborn.MODID+".engine.hobbyist_steam";
 	}
 	
 	@Override
 	public boolean isItemValidForSlot(int index, ItemStack stack){
-		return index!=0||MachineRecipes.COKE_OVEN.getCrafting(stack)!=null;
+		return TileEntityFurnace.isItemFuel(stack);
 	}
 	
 	@Override
-	public ContainerHobbyistEngine getContainer(TileEntity te, EntityPlayer player){
-		return new ContainerHobbyistEngine(te, this, this.inv, player);
+	public ContainerEngineHobbyistSteam getContainer(TileEntity te, EntityPlayer player){
+		return new ContainerEngineHobbyistSteam(te, this, this.inv, player);
 	}
 	
 	@Override
 	public GuiContainer getGui(TileEntity te, EntityPlayer player){
-		return new GuiHobbyistEngine(getContainer(te, player));
+		return new GuiEngineHobbyistSteam(getContainer(te, player));
 	}
 	
 	@Override
@@ -118,33 +115,25 @@ public class LogicEngineHobbyist extends LogicEngine implements InventoryBuilder
 	
 	@Override
 	public int getField(int id){
-		switch(id){
-			default:
-				throw new IllegalArgumentException("id: "+id);
-		}
+		return 0;
 	}
 	
 	@Override
 	public void setField(int id, int value){
-		switch(id){
-			default:
-				throw new IllegalArgumentException("id: "+id);
-		}
+		// TODO temperature
 	}
 	
 	@Override
 	public int getFieldCount(){
-		return 0;
+		return 1;
 	}
-
+	
 	@Override
-	public FluidTank getTank() {
-		return this.tank;
-	}
-
-	@Override
-	public Inventory getInventory() {
-		return this.inv;
+	public JsonElement getDebugInfo(){
+		JsonObject obj = new JsonObject();
+		obj.add("Inventory", this.inv.getDebugInfo());
+		obj.add("Fluid Tank", Debugable.debugFluidTank(this.tank));
+		return Debugable.stateClassType(this.getClass(), obj);
 	}
 	
 	@Override
@@ -164,24 +153,8 @@ public class LogicEngineHobbyist extends LogicEngine implements InventoryBuilder
 		if(cap==CapabilityItemHandler.ITEM_HANDLER_CAPABILITY){
 			return (T)this.inv.create(facing);
 		}else if(cap==CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY){
-			if(tankCapability==null) tankCapability = new FluidWrapper(tank, true, false);
+			if(tankCapability==null) tankCapability = new FluidHandlerFluidMap().addHandler(FluidRegistry.WATER, waterTank).addHandler(ModFluids.STEAM, this.tank);
 			return (T)tankCapability;
 		}else return super.getCapability(cap, facing);
 	}
-
-	@Override
-	public long capacityRJ() {
-		return 2000;
-	}
-
-	@Override
-	public long maxRJIn(){
-		return 300;
-	}
-
-	@Override
-	public long maxRJOut(){
-		return 300;
-	}
-
 }
