@@ -17,7 +17,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fluids.FluidTank;
 
 public class LogicEngineSteam extends LogicEngineFluid{
-	private final Inventory.Name name = new Inventory.Name(RailReborn.MODID+".engine.steam");
+	private final Inventory.Name name = new Inventory.Name(RailReborn.MODID+".engine.steam", true);
 	
 	@Override
 	protected int fuelTime(){

@@ -81,26 +81,24 @@ public class TEEngine extends TELogic implements ITickable{
 	
 	@Override
 	protected boolean hasLogicCapability(Capability<?> cap, EnumFacing facing){
-		EnumFacing f = blockFacing();
-		return facing==(cap==RailRebornAPI.RJ ? f : f.getOpposite()) ? logic.hasCapability(cap, facing) : false;
+		return facing==null||facing==(cap==RailRebornAPI.RJ ? blockFacing() : blockFacing().getOpposite()) ? logic.hasCapability(cap, facing) : false;
 	}
 	
 	@Override
 	@Nullable
 	protected <T> T getLogicCapability(Capability<T> cap, EnumFacing facing){
-		EnumFacing f = blockFacing();
-		return facing==(cap==RailRebornAPI.RJ ? f : f.getOpposite()) ? logic.getCapability(cap, facing) : null;
+		return facing==null||facing==(cap==RailRebornAPI.RJ ? blockFacing() : blockFacing().getOpposite()) ? logic.getCapability(cap, facing) : null;
 	}
 	
 	private EnumFacing blockFacing(){
 		IBlockState state = this.world.getBlockState(pos);
 		switch(state.getValue(BlockEngine.STATE)){
 			case FLOOR:
-				return EnumFacing.DOWN;
+				return EnumFacing.UP;
 			case WALL:
 				return state.getValue(BlockHorizontal.FACING);
 			default: // case CEILING:
-				return EnumFacing.UP;
+				return EnumFacing.DOWN;
 		}
 	}
 }

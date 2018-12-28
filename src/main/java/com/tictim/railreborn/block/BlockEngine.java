@@ -35,7 +35,7 @@ public class BlockEngine extends Block{
 		if(!world.isRemote){
 			TileEntity te = world.getTileEntity(pos);
 			if(te instanceof TEEngine){
-				if(!FluidUtil.interactWithFluidHandler(player, hand, world, pos, facing)) engine.getGui().openGui(player, world, pos);
+				if(!FluidUtil.interactWithFluidHandler(player, hand, world, pos, null)) engine.getGui().openGui(player, world, pos);
 			}
 		}
 		return true;

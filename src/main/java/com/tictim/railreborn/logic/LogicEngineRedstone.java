@@ -8,7 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.ITextComponent;
 
 public class LogicEngineRedstone extends LogicEngine{
-	private final Inventory.Name name = new Inventory.Name(RailReborn.MODID+".engine.redstone");
+	private final Inventory.Name name = new Inventory.Name(RailReborn.MODID+".engine.redstone_repeater", true);
 	private boolean toggle;
 	
 	@Override
