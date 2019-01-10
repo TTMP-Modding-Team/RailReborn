@@ -1,6 +1,7 @@
 ﻿
 itemGroup.railReborn.items=Rail Reborn: Items
 itemGroup.railReborn.blocks=Rail Reborn: Blocks
+itemGroup.railReborn.pipes=Rail Reborn: Pipes
 
 item.misc.coke.name=Coal Coke
 item.misc.coal_dust.name=Dust of Coal
@@ -35,6 +36,7 @@ item.crowbar_iron.name=Iron Crowbar
 item.crowbar_steel.name=Steel Crowbar
 item.crowbar_stainless.name=Stainless Steel Crowbar
 item.crowbar_fool.name=Fool's Crowbar
+item.fools_goggle.name=Fool's Goggles
 
 tile.railReborn.coal_coke_block.name=Block of Coal Coke
 tile.railReborn.tin_ore.name=Tin Ore

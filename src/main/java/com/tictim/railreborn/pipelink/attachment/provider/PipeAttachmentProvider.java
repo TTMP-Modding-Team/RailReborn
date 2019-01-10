@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 
 public abstract class PipeAttachmentProvider extends IForgeRegistryEntry.Impl<PipeAttachmentProvider>{
 	private boolean collectible = true;
-	private boolean blocksConnection = true;
+	private ConnectionRequirement connectionRequirement;
 	
 	@Nullable
 	public abstract PipeAttachment createPipeAttachment(PipeHandler handler, World world, BlockPos target, EnumFacing facing);
@@ -29,12 +29,12 @@ public abstract class PipeAttachmentProvider extends IForgeRegistryEntry.Impl<Pi
 		return this;
 	}
 	
-	public boolean blocksConnection(){
-		return blocksConnection;
+	public ConnectionRequirement getConnectionRequirement(){
+		return connectionRequirement;
 	}
 	
-	public PipeAttachmentProvider setBlocksConnection(boolean value){
-		this.blocksConnection = value;
+	public PipeAttachmentProvider setConnectionRequirement(ConnectionRequirement value){
+		this.connectionRequirement = value;
 		return this;
 	}
 	
@@ -49,5 +49,23 @@ public abstract class PipeAttachmentProvider extends IForgeRegistryEntry.Impl<Pi
 			of.setTagCompound(nbt);
 		}
 		return of;
+	}
+	
+	public enum ConnectionRequirement{
+		MUST_BE_CONNECTED,
+		MUST_BE_DISCONNCTED,
+		NO_REQUIREMENTS;
+		
+		public boolean isConnectedStateValid(){
+			return this!=MUST_BE_DISCONNCTED;
+		}
+		
+		public boolean isDisconnectedStateValid(){
+			return this!=MUST_BE_CONNECTED;
+		}
+		
+		public boolean isStateValid(boolean connected){
+			return connected ? isConnectedStateValid() : isDisconnectedStateValid();
+		}
 	}
 }

@@ -5,7 +5,6 @@ import com.tictim.railreborn.block.ModBlocks;
 import com.tictim.railreborn.client.teisr.TEISRPipe;
 import com.tictim.railreborn.config.RailRebornCfg;
 import com.tictim.railreborn.enums.*;
-import com.tictim.railreborn.pipelink.handler.PipeHandlers;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -24,7 +23,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.registries.IForgeRegistry;
 
-import static com.tictim.railreborn.block.ModBlocks.TAB_BLOCKS;
+import static com.tictim.railreborn.block.ModBlocks.TAB_PIPES;
 
 @EventBusSubscriber(modid = RailReborn.MODID)
 public final class ModItems{
@@ -73,7 +72,7 @@ public final class ModItems{
 	public static final ItemBlockBase ENGINE_STEAM = new ItemBlockBase(ModBlocks.ENGINE_STEAM);
 	public static final ItemBlockBase ENGINE_DIESEL = new ItemBlockBase(ModBlocks.ENGINE_DIESEL);
 	
-	public static final ItemBlockBase PIPE_STUFFED = new ItemBlockBase(ModBlocks.PIPE_STUFFED);
+	public static final ItemBlockBase PIPES = new ItemBlockPipe(ModBlocks.PIPES);
 	
 	static{
 		CROWBAR_IRON.setRegistryName("crowbar_iron").setUnlocalizedName("crowbar_iron").setCreativeTab(TAB_ITEMS);
@@ -90,7 +89,7 @@ public final class ModItems{
 		STAINLESS_STEEL.setRegistryName("stainless_steel").setUnlocalizedName("railReborn.stainless_steel").setCreativeTab(TAB_ITEMS);
 		CHROME.setRegistryName("chrome").setUnlocalizedName("railReborn.chrome").setCreativeTab(TAB_ITEMS);
 		
-		PIPE_ATTACHMENTS.setRegistryName("pipe_attachments").setUnlocalizedName("pipe_attachments").setCreativeTab(TAB_BLOCKS);
+		PIPE_ATTACHMENTS.setRegistryName("pipe_attachments").setUnlocalizedName("pipe_attachments").setCreativeTab(TAB_PIPES);
 		
 		COAL_COKE_BLOCK.setRegistryName("coal_coke_block");
 		ORE_TIN.setRegistryName("ore_tin");
@@ -112,7 +111,7 @@ public final class ModItems{
 		ENGINE_STEAM.setRegistryName("engine.steam");
 		ENGINE_DIESEL.setRegistryName("engine.diesel");
 		
-		PIPE_STUFFED.setRegistryName("pipe.stuffed");
+		PIPES.setRegistryName("pipe");
 	}
 	
 	@SubscribeEvent
@@ -154,7 +153,7 @@ public final class ModItems{
 		registry.register(ENGINE_STEAM);
 		registry.register(ENGINE_DIESEL);
 		
-		registry.register(PIPE_STUFFED);
+		registry.register(PIPES);
 	}
 	
 	public static void registerOreDict(){
@@ -216,9 +215,9 @@ public final class ModItems{
 		ModelLoader.setCustomModelResourceLocation(ENGINE_STEAM, 0, mrl("engine/steam"));
 		ModelLoader.setCustomModelResourceLocation(ENGINE_DIESEL, 0, mrl("engine/diesel"));
 		
-		ModelLoader.setCustomModelResourceLocation(PIPE_STUFFED, 0, mrl("pipe"));
+		ModelLoader.setCustomModelResourceLocation(PIPES, 0, mrl("pipe"));
 		
-		PIPE_STUFFED.setTileEntityItemStackRenderer(new TEISRPipe(PipeHandlers.STUFFED));
+		PIPES.setTileEntityItemStackRenderer(new TEISRPipe());
 	}
 	
 	@SideOnly(Side.CLIENT)

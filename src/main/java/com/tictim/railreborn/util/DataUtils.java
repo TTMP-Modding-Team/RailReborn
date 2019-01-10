@@ -11,14 +11,17 @@ public final class DataUtils{
 	
 	public static NBTTagCompound toNBT(BlockPos pos){
 		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setInteger("x", pos.getX());
-		nbt.setByte("y", (byte)pos.getY());
-		nbt.setInteger("z", pos.getZ());
+		if(BlockPos.fromLong(pos.toLong()).equals(pos)) nbt.setLong("xyz", pos.toLong());
+		else{
+			nbt.setInteger("x", pos.getX());
+			nbt.setInteger("y", pos.getY());
+			nbt.setInteger("z", pos.getZ());
+		}
 		return nbt;
 	}
 	
 	public static BlockPos toBlockPos(NBTTagCompound nbt){
-		return new BlockPos(nbt.getInteger("x"), nbt.getInteger("y"), nbt.getInteger("z"));
+		return nbt.hasKey("xyz", NBTTypes.LONG) ? BlockPos.fromLong(nbt.getLong("xyz")) : new BlockPos(nbt.getInteger("x"), nbt.getInteger("y"), nbt.getInteger("z"));
 	}
 	
 	public static void writeBlockPos(ByteBuf buf, BlockPos pos){

@@ -1,7 +1,7 @@
 package com.tictim.railreborn.tileentity;
 
 import com.google.gson.JsonElement;
-import com.tictim.railreborn.RailReborn;
+import com.tictim.railreborn.Registries;
 import com.tictim.railreborn.capability.Debugable;
 import com.tictim.railreborn.pipelink.PipeNode;
 import com.tictim.railreborn.pipelink.WorldPipeLink;
@@ -14,8 +14,6 @@ import com.tictim.railreborn.util.DataUtils;
 import com.tictim.railreborn.util.DebugJsonBuilder;
 import com.tictim.railreborn.util.NBTTypes;
 import net.minecraft.block.Block;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
@@ -31,16 +29,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 
 public class TEPipe extends TileEntity implements Debugable{
-	private PipeHandler handler = PipeHandlers.INVALID;
 	public PipeVisual visual;
 	
-	public TEPipe setHandler(PipeHandler handler){
-		this.handler = handler;
-		return this;
-	}
-	
 	public PipeHandler getHandler(){
-		return this.handler;
+		PipeNode node = getNode();
+		return node!=null ? node.getPipeHandler() : PipeHandlers.INVALID;
 	}
 	
 	@Override
@@ -48,60 +41,34 @@ public class TEPipe extends TileEntity implements Debugable{
 		super.validate();
 	}
 	
-	public void onPlacement(){
-		PipeNode thisNode = null;
+	public void onPlacement(PipeHandler handler){
+		WorldPipeLink wpl = WorldPipeLink.get(this.world);
+		PipeNode thisNode = wpl.create(pos, handler);
+		
 		for(EnumFacing f: EnumFacing.VALUES){
-			PipeNode node2 = tryGetNode(f);
-			if(node2!=null){
-				if(thisNode==null){
-					thisNode = node2.create(f.getOpposite(), this.pos);
-				}else{
-					thisNode.tryConnect(node2, f);
-				}
-			}
-		}
-		if(thisNode==null){
-			thisNode = WorldPipeLink.get(this.world).assign(this.handler, this.pos);
-		}
-		for(EnumFacing f: EnumFacing.VALUES){
+			thisNode.tryConnect(f);
 			thisNode.tryAppendAttachment(PipeAttachments.DEFAULT, f);
 		}
-		// TODO connect to machines etc.
 	}
 	
 	public void onBreak(){
 		PipeNode node = getNode();
-		if(node!=null) node.disconnectToAll(this.world);
+		if(node!=null) node.disconnectToAll(noDrop);
 	}
 	
 	@Nullable
 	public PipeNode getNode(){
-		return WorldPipeLink.get(this.world).getNode(this.handler, this.pos);
-	}
-	
-	@Nullable
-	public PipeNode tryGetNode(EnumFacing facing){
-		TileEntity te = this.world.getTileEntity(this.pos.offset(facing));
-		if(te instanceof TEPipe){
-			TEPipe pipe = (TEPipe)te;
-			return pipe.handler==this.handler ? pipe.getNode() : null;
-		}else return null;
+		return WorldPipeLink.get(this.world).getNode(this.pos);
 	}
 	
 	public boolean tryConnect(EnumFacing facing){
 		PipeNode node = getNode();
 		if(node==null) return false;
 		
-		PipeNode anotherNode = node.getConnectedNode(facing);
-		if(anotherNode==null){
-			anotherNode = tryGetNode(facing);
-			if(anotherNode!=null){
-				node.tryConnect(anotherNode, facing);
-				DataUtils.updateTileEntity(this);
-				return true;
-			}
-		}
-		return false;
+		if(node.getConnectedNode(facing)==null&&node.tryConnect(facing)){
+			DataUtils.updateTileEntity(this);
+			return true;
+		}else return false;
 	}
 	
 	public boolean tryDisconnect(EnumFacing facing){
@@ -119,10 +86,29 @@ public class TEPipe extends TileEntity implements Debugable{
 		return false;
 	}
 	
+	public boolean updateConnection(EnumFacing facing){
+		PipeNode node = getNode();
+		if(node==null) return false;
+		
+		boolean returns = false;
+		
+		if(node.getConnectedNode(facing)==null) returns = tryConnect(facing);
+		if(node.checkAttachment(facing)){
+			DataUtils.updateTileEntity(this);
+			return true;
+		}else return returns;
+	}
+	
 	public boolean onAttachment(PipeAttachmentProvider p, EnumFacing facing){
 		PipeNode node = getNode();
 		if(node==null) return false;
 		return node.getAttachment(facing)==null&&node.tryAppendAttachment(p, facing);
+	}
+	
+	private boolean noDrop;
+	
+	public void setNoDrop(boolean noDrop){
+		this.noDrop = noDrop;
 	}
 	
 	@Override
@@ -132,21 +118,15 @@ public class TEPipe extends TileEntity implements Debugable{
 	
 	@Override
 	public void handleUpdateTag(NBTTagCompound nbt){
-		this.handler = PipeHandlers.REGISTRY.getValue(new ResourceLocation(nbt.getString("pipe")));
-		if(this.handler==PipeHandlers.INVALID) RailReborn.LOGGER.error("TEPipe synced with invalid PipeHandler");
-		if(nbt.hasKey("visual", NBTTypes.LIST)){
-			this.visual = new PipeVisual(nbt.getTagList("visual", NBTTypes.COMPOUND));
-		}
+		this.visual = new PipeVisual(nbt.getCompoundTag("visual"));
 	}
 	
 	@Override
 	public NBTTagCompound getUpdateTag(){
 		NBTTagCompound nbt = super.getUpdateTag();
-		nbt.setString("pipe", handler.getRegistryName().toString());
 		PipeNode node = getNode();
 		if(node!=null){
-			NBTTagList list = new PipeVisual(node).serializeNBT();
-			if(!list.hasNoTags()) nbt.setTag("visual", list);
+			nbt.setTag("visual", new PipeVisual(node).serializeNBT());
 		}
 		return nbt;
 	}
@@ -165,10 +145,7 @@ public class TEPipe extends TileEntity implements Debugable{
 	
 	@Override
 	public JsonElement getDebugInfo(){
-		DebugJsonBuilder b = new DebugJsonBuilder(this.getClass());
-		b.key("Pipe Handler").add(handler.getRegistryName());
-		b.key("").add(getNode());
-		return b.getDebugInfo();
+		return new DebugJsonBuilder(this.getClass()).key("").add(getNode()).getDebugInfo();
 	}
 	
 	@Override
@@ -185,6 +162,7 @@ public class TEPipe extends TileEntity implements Debugable{
 	
 	@Override
 	@Nullable
+	@SuppressWarnings("unchecked")
 	public <T> T getCapability(Capability<T> cap, EnumFacing facing){
 		if(cap==Debugable.CAP) return (T)this;
 		PipeNode node = getNode();
@@ -192,24 +170,12 @@ public class TEPipe extends TileEntity implements Debugable{
 		return t!=null ? t : super.getCapability(cap, facing);
 	}
 	
-	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt){
-		super.writeToNBT(nbt);
-		nbt.setString("pipe", handler.getRegistryName().toString());
-		return nbt;
-	}
-	
-	@Override
-	public void readFromNBT(NBTTagCompound nbt){
-		super.readFromNBT(nbt);
-		this.handler = PipeHandlers.REGISTRY.getValue(new ResourceLocation(nbt.getString("pipe")));
-		if(this.handler==PipeHandlers.INVALID) RailReborn.LOGGER.error("TEPipe loaded with invalid PipeHandler");
-	}
-	
 	public static class PipeVisual{
+		private PipeHandler handler;
 		private final PipeSideVisual[] sides = new PipeSideVisual[6];
 		
 		public PipeVisual(PipeNode node){
+			this.handler = node.getPipeHandler();
 			for(EnumFacing f: EnumFacing.VALUES){
 				PipeAttachment a = node.getAttachment(f);
 				if(a!=null) sides[f.getIndex()] = new PipeSideVisual(a, node.getConnectedNode(f)!=null);
@@ -217,9 +183,18 @@ public class TEPipe extends TileEntity implements Debugable{
 			}
 		}
 		
-		public PipeVisual(){
-			sides[EnumFacing.EAST.getIndex()] = new PipeSideVisual(false);
-			sides[EnumFacing.WEST.getIndex()] = new PipeSideVisual(false);
+		public PipeVisual(PipeHandler handler){
+			this.handler = handler;
+			this.sides[EnumFacing.EAST.getIndex()] = new PipeSideVisual(false);
+			this.sides[EnumFacing.WEST.getIndex()] = new PipeSideVisual(false);
+		}
+		
+		public PipeHandler getHandler(){
+			return handler;
+		}
+		
+		public void setHandler(PipeHandler handler){
+			this.handler = handler;
 		}
 		
 		@Nullable
@@ -227,26 +202,31 @@ public class TEPipe extends TileEntity implements Debugable{
 			return sides[facing.getIndex()];
 		}
 		
-		public PipeVisual(NBTTagList list){
+		public PipeVisual(NBTTagCompound nbt){
+			this.handler = PipeHandlers.fromId(nbt.getShort("handler"));
+			NBTTagList list = nbt.getTagList("list", NBTTypes.COMPOUND);
 			for(int i = 0; i<list.tagCount(); i++){
-				NBTTagCompound nbt = list.getCompoundTagAt(i);
-				int idx = nbt.getByte("idx");
+				NBTTagCompound subnbt = list.getCompoundTagAt(i);
+				int idx = subnbt.getByte("idx");
 				if(idx >= 0&&idx<6){
-					sides[idx] = new PipeSideVisual(nbt);
+					sides[idx] = new PipeSideVisual(subnbt);
 				}
 			}
 		}
 		
-		public NBTTagList serializeNBT(){
+		public NBTTagCompound serializeNBT(){
+			NBTTagCompound nbt = new NBTTagCompound();
+			nbt.setShort("handler", PipeHandlers.toId(handler));
 			NBTTagList list = new NBTTagList();
 			for(int i = 0; i<6; i++){
 				if(sides[i]!=null){
-					NBTTagCompound nbt = sides[i].serializeNBT();
-					nbt.setByte("idx", (byte)i);
-					list.appendTag(nbt);
+					NBTTagCompound subnbt = sides[i].serializeNBT();
+					subnbt.setByte("idx", (byte)i);
+					list.appendTag(subnbt);
 				}
 			}
-			return list;
+			if(!list.hasNoTags()) nbt.setTag("list", list);
+			return nbt;
 		}
 	}
 	
@@ -267,7 +247,7 @@ public class TEPipe extends TileEntity implements Debugable{
 		}
 		
 		public PipeSideVisual(NBTTagCompound nbt){
-			attachment = PipeAttachments.REGISTRY.getValue(new ResourceLocation(nbt.getString("attachment")));
+			attachment = Registries.PIPE_ATTACHMENTS.getValue(new ResourceLocation(nbt.getString("attachment")));
 			connectedToNode = nbt.getBoolean("connected");
 			meta = nbt.getInteger("meta");
 		}

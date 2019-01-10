@@ -4,6 +4,7 @@ import com.tictim.railreborn.util.ArmorMaterials;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -14,6 +15,11 @@ import java.util.List;
 public class ItemFoolsArmor extends ItemArmor{
 	public ItemFoolsArmor(EntityEquipmentSlot slot){
 		super(ArmorMaterials.FOOLS_SUITE, 0, slot);
+	}
+	
+	@Override
+	public EnumRarity getRarity(ItemStack stack){
+		return EnumRarity.EPIC;
 	}
 	
 	@Override

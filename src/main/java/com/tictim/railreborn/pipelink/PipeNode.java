@@ -2,11 +2,13 @@ package com.tictim.railreborn.pipelink;
 
 import com.google.gson.JsonElement;
 import com.tictim.railreborn.RailReborn;
+import com.tictim.railreborn.Registries;
 import com.tictim.railreborn.capability.Debugable;
 import com.tictim.railreborn.multiblock.Blueprint;
 import com.tictim.railreborn.pipelink.attachment.PipeAttachment;
-import com.tictim.railreborn.pipelink.attachment.PipeAttachments;
 import com.tictim.railreborn.pipelink.attachment.provider.PipeAttachmentProvider;
+import com.tictim.railreborn.pipelink.handler.PipeHandler;
+import com.tictim.railreborn.pipelink.handler.PipeHandlers;
 import com.tictim.railreborn.tileentity.TEPipe;
 import com.tictim.railreborn.util.DataUtils;
 import com.tictim.railreborn.util.DebugJsonBuilder;
@@ -28,19 +30,22 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class PipeNode implements ICapabilityProvider, Debugable{
-	private final PipeLink link;
+	private final WorldPipeLink wpl;
 	private final BlockPos pos;
+	private final PipeHandler handler;
 	private final PipeNode[] nodes = new PipeNode[6];
 	private final PipeAttachment[] attachments = new PipeAttachment[6];
 	
-	public PipeNode(PipeLink link, BlockPos pos){
-		this.link = link;
+	public PipeNode(WorldPipeLink wpl, BlockPos pos, PipeHandler handler){
+		this.wpl = wpl;
 		this.pos = pos;
+		this.handler = handler;
 	}
 	
-	public PipeNode(PipeLink link, NBTTagCompound nbt){
-		this.link = link;
+	public PipeNode(WorldPipeLink wpl, NBTTagCompound nbt){
+		this.wpl = wpl;
 		this.pos = DataUtils.toBlockPos(nbt);
+		this.handler = PipeHandlers.fromId(nbt.getShort("handler"));
 	}
 	
 	@SuppressWarnings("ConstantConditions")
@@ -51,91 +56,105 @@ public class PipeNode implements ICapabilityProvider, Debugable{
 				NBTTagCompound subnbt = list.getCompoundTagAt(i);
 				int idx = subnbt.getInteger("index");
 				if(idx >= 0&&idx<6){
-					nodes[idx] = link.getNode(DataUtils.toBlockPos(subnbt));
+					if(subnbt.getBoolean("connected")){
+						nodes[idx] = wpl.getNode(this.pos.offset(EnumFacing.getFront(idx)));
+					}
 					if(subnbt.hasKey("attachment", NBTTypes.COMPOUND)){
 						NBTTagCompound anbt = subnbt.getCompoundTag("attachment");
-						PipeAttachmentProvider p = PipeAttachments.REGISTRY.getValue(new ResourceLocation(anbt.getString("provider")));
-						attachments[idx] = p.deserializePipeAttachment(link.getPipeHandler(), anbt);
+						PipeAttachmentProvider p = Registries.PIPE_ATTACHMENTS.getValue(new ResourceLocation(anbt.getString("provider")));
+						attachments[idx] = p.deserializePipeAttachment(handler, anbt);
 					}
 				}else RailReborn.LOGGER.error("Invalid Index {} on PipeNode at {}!", idx, Blueprint.posToStr(pos));
 			}
 		}
 	}
 	
-	public PipeLink getLink(){
-		return this.link;
-	}
-	
 	public BlockPos getPos(){
 		return this.pos;
 	}
 	
-	public PipeNode create(EnumFacing facing, BlockPos pos){
-		PipeNode n = this.getConnectedNode(facing);
-		if(n!=null) return n;
-		PipeNode node = new PipeNode(link, pos);
-		link.add(node);
-		add(node, facing);
-		node.add(this, facing.getOpposite());
-		this.updateNode();
-		return node;
+	public PipeHandler getPipeHandler(){
+		return this.handler;
 	}
 	
-	public void add(PipeNode node, EnumFacing facing){
-		nodes[facing.getIndex()] = node;
+	public boolean connect(PipeNode node, EnumFacing facing, boolean test){
+		if(node.handler==this.handler&&this.nodes[facing.getIndex()]==null){
+			PipeAttachment a = this.getAttachment(facing);
+			if(a==null||a.getProvider().getConnectionRequirement().isConnectedStateValid()){
+				if(!test){
+					nodes[facing.getIndex()] = node;
+					checkAttachment(facing);
+				}
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public void disconnect(EnumFacing facing){
 		nodes[facing.getIndex()] = null;
+		checkAttachment(facing);
 	}
 	
-	public void removeAttachment(EnumFacing facing){
+	public PipeAttachment removeAttachment(EnumFacing facing){
+		PipeAttachment a = attachments[facing.getIndex()];
 		attachments[facing.getIndex()] = null;
+		return a;
 	}
 	
-	public void tryConnect(PipeNode node, EnumFacing facing){
-		add(node, facing);
-		node.add(this, facing.getOpposite());
-		node.updateNode();
-		if(!this.getLink().isSameLink(node.getLink())) this.getLink().merge(node.getLink());
-		else this.getLink().markDirty();
-	}
-	
-	public boolean tryAppendAttachment(PipeAttachmentProvider provider, EnumFacing facing){
-		PipeAttachment a = PipeAttachments.DEFAULT.createPipeAttachment(this.link.getPipeHandler(), this.link.getWorld(), this.pos.offset(facing), facing);
-		if(a!=null){
-			this.attachments[facing.getIndex()] = a;
-			if(provider.blocksConnection()) disconnect(facing);
-			link.markDirty();
+	public boolean tryConnect(EnumFacing facing){
+		PipeNode node2 = wpl.getNode(this.pos.offset(facing));
+		if(node2!=null&&this.connect(node2, facing, true)&&node2.connect(this, facing.getOpposite(), true)){
+			this.connect(node2, facing, false);
+			node2.connect(this, facing.getOpposite(), false);
+			node2.updateNode();
+			wpl.markDirty();
 			return true;
 		}else return false;
 	}
 	
+	public boolean tryAppendAttachment(PipeAttachmentProvider provider, EnumFacing facing){
+		if(!provider.getConnectionRequirement().isStateValid(this.isConnected(facing))) return false;
+		PipeAttachment a = provider.createPipeAttachment(this.handler, this.wpl.getWorld(), this.pos.offset(facing), facing);
+		if(a!=null){
+			this.attachments[facing.getIndex()] = a;
+			wpl.markDirty();
+			return true;
+		}else return false;
+	}
+	
+	public boolean checkAttachment(EnumFacing facing){
+		PipeAttachment a = this.getAttachment(facing);
+		if(a!=null&&a.isDismantled(this, facing)){
+			InventoryHelper.spawnItemStack(this.wpl.getWorld(), pos.getX(), pos.getY(), pos.getZ(), removeAttachment(facing).getProvider().stackOf());
+		}
+		return false;
+	}
+	
 	public void updateNode(){
-		TileEntity te = this.link.getWorld().getTileEntity(this.pos);
+		TileEntity te = this.wpl.getWorld().getTileEntity(this.pos);
 		if(te instanceof TEPipe) DataUtils.updateTileEntity(te);
 	}
 	
-	public void disconnectToAll(World w){
+	public void disconnectToAll(boolean noDrop){
+		World w = this.wpl.getWorld();
 		for(int i = 0; i<6; i++){
 			if(nodes[i]!=null){
 				nodes[i].disconnect(EnumFacing.VALUES[i].getOpposite());
 				nodes[i].updateNode();
 			}
-			if(attachments[i]!=null){
+			if(!noDrop&&attachments[i]!=null){
 				ItemStack s = attachments[i].getProvider().stackOf();
 				if(!s.isEmpty()) InventoryHelper.spawnItemStack(w, pos.getX(), pos.getY(), pos.getZ(), s.copy());
 			}
 		}
-		link.remove(pos);
+		if(!noDrop) InventoryHelper.spawnItemStack(w, pos.getX(), pos.getY(), pos.getZ(), this.getPipeHandler().of().copy());
+		wpl.remove(this.pos);
 	}
 	
 	@Nullable
 	public PipeNode getConnectedNode(EnumFacing facing){
-		PipeNode n = nodes[facing.getIndex()];
-		if(n==null) return null;
-		PipeAttachment a =  getAttachment(facing);
-		return a!=null&&a.getProvider().blocksConnection() ? null : n;
+		return nodes[facing.getIndex()];
 	}
 	
 	@Nullable
@@ -144,11 +163,11 @@ public class PipeNode implements ICapabilityProvider, Debugable{
 	}
 	
 	public boolean isConnected(EnumFacing f){
-		return getConnectedNode(f)!=null||getAttachment(f)!=null;
+		return getConnectedNode(f)!=null;
 	}
 	
 	public boolean isLoaded(){
-		return this.link.getWorld().isBlockLoaded(this.pos);
+		return this.wpl.getWorld().isBlockLoaded(this.pos);
 	}
 	
 	@Override
@@ -158,8 +177,9 @@ public class PipeNode implements ICapabilityProvider, Debugable{
 	
 	@Override
 	public JsonElement getDebugInfo(){
-		DebugJsonBuilder b = new DebugJsonBuilder(this.getClass()).add(pos);
+		DebugJsonBuilder b = new DebugJsonBuilder(pos);
 		b.key("").moveFloor();
+		b.key("Pipe Handler").add(handler.getRegistryName());
 		for(EnumFacing facing: EnumFacing.VALUES){
 			PipeNode n = getConnectedNode(facing);
 			PipeAttachment a = getAttachment(facing);
@@ -202,10 +222,11 @@ public class PipeNode implements ICapabilityProvider, Debugable{
 		NBTTagCompound nbt = DataUtils.toNBT(pos);
 		NBTTagList list = new NBTTagList();
 		for(int i = 0; i<6; i++){
-			NBTTagCompound subnbt = null;
+			NBTTagCompound subnbt;
 			if(nodes[i]!=null){
-				subnbt = DataUtils.toNBT(nodes[i].getPos());
-			}
+				subnbt = new NBTTagCompound();
+				subnbt.setBoolean("connected", true);
+			}else subnbt = null;
 			if(attachments[i]!=null){
 				NBTTagCompound anbt = attachments[i].serializeNBT();
 				anbt.setString("provider", attachments[i].getProvider().getRegistryName().toString());
@@ -218,6 +239,7 @@ public class PipeNode implements ICapabilityProvider, Debugable{
 			}
 		}
 		if(!list.hasNoTags()) nbt.setTag("nodes", list);
+		nbt.setShort("handler", PipeHandlers.toId(this.handler));
 		return nbt;
 	}
 }

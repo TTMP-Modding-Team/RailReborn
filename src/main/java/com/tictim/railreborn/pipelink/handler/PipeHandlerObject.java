@@ -1,7 +1,5 @@
 package com.tictim.railreborn.pipelink.handler;
 
-import com.tictim.railreborn.client.render.PipeRenderer;
-import com.tictim.railreborn.client.render.PipeRendererOpaque;
 import com.tictim.railreborn.pipelink.attachment.PipeAttachment;
 import com.tictim.railreborn.pipelink.attachment.PipeAttachments;
 import net.minecraft.nbt.NBTTagCompound;
@@ -11,7 +9,7 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class PipeHandlerInvalid extends PipeHandler{
+public class PipeHandlerObject extends PipeHandler{
 	@Override
 	@Nullable
 	public PipeAttachment createDefaultPipeAttachment(World world, BlockPos target, EnumFacing facing){
@@ -21,10 +19,5 @@ public class PipeHandlerInvalid extends PipeHandler{
 	@Override
 	public PipeAttachment deserializeDefaultPipeAttachment(NBTTagCompound nbt){
 		return PipeAttachments.INVALID.deserializePipeAttachment(this, nbt);
-	}
-	
-	@Override
-	protected PipeRenderer createPipeRenderer(){
-		return new PipeRendererOpaque(this);
 	}
 }

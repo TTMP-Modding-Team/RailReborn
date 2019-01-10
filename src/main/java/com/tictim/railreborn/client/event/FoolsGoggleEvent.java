@@ -4,10 +4,10 @@ import com.tictim.railreborn.RailReborn;
 import com.tictim.railreborn.item.ModItems;
 import com.tictim.railreborn.network.MessagePipeData;
 import com.tictim.railreborn.network.MessagePipeRequest;
-import com.tictim.railreborn.pipelink.PipeLink;
 import com.tictim.railreborn.pipelink.PipeNode;
 import com.tictim.railreborn.pipelink.attachment.PipeAttachment;
 import com.tictim.railreborn.tileentity.TEPipe;
+import com.tictim.railreborn.pipelink.WorldPipeLink;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
@@ -26,84 +26,57 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
 
-@Mod.EventBusSubscriber(modid = RailReborn.MODID, value = Side.CLIENT)
+/**
+ * @deprecated
+ */
+//@Mod.EventBusSubscriber(modid = RailReborn.MODID, value = Side.CLIENT)
 @SideOnly(Side.CLIENT)
 public final class FoolsGoggleEvent{
 	private FoolsGoggleEvent(){}
 	
-	private static final Set<PipeLink> pipes = new HashSet<>();
+	private static WorldPipeLink wpl;
 	
-	private static int dim;
 	@Nullable
-	private static PipeLink latestLink;
+	private static BlockPos latestPointing;
 	private static short tick = 0;
-	private static short tick2 = 0;
 	
 	@SubscribeEvent
 	public static void clientTick(TickEvent.ClientTickEvent event){
 		EntityPlayer p = Minecraft.getMinecraft().player;
 		if(p!=null&&p.getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem()==ModItems.FOOLS_GOGGLE){
-			synchronized(pipes){
-				if(!pipes.isEmpty()){
-					int d = p.world.provider.getDimension();
-					if(d!=dim){
-						dim = d;
-						pipes.clear();
-					}
-				}
-				RayTraceResult ray = Minecraft.getMinecraft().objectMouseOver;
-				if(ray!=null&&ray.typeOfHit==RayTraceResult.Type.BLOCK){
-					BlockPos pointing = ray.getBlockPos();
-					PipeLink link = getByPos(pointing);
-					if(link!=null){
-						if(latestLink==link){
-							if(++tick>200){
-								tick = 0;
-								RailReborn.NET.sendToServer(new MessagePipeRequest(pointing));
-							}
-						}else{
-							latestLink = link;
-							tick = 0;
-						}
-					}else{
-						TileEntity te = p.world.getTileEntity(pointing);
-						if(te instanceof TEPipe) RailReborn.NET.sendToServer(new MessagePipeRequest(pointing));
-					}
-					return;
-				}
-				if(!pipes.isEmpty()){
-					if(++tick2>2000){
-						tick2 = 0;
-						Iterator<PipeLink> it = pipes.iterator();
-						while(it.hasNext()) if(it.next().isFullyUnloaded()) it.remove();
-					}
-				}else tick2 = 0;
+			if(wpl==null||(wpl.getWorld()!=p.world)){ // &&wpl.getWorld().provider.getDimension()!=p.world.provider.getDimension()
+				wpl = new WorldPipeLink(p.world);
 			}
-		}else synchronized(pipes){
-			if(!pipes.isEmpty()) pipes.clear();
-		}
-		latestLink = null;
-	}
-	
-	private static PipeLink getByPos(BlockPos pos){
-		for(PipeLink l: pipes){
-			if(l.containsNode(pos)) return l;
-		}
-		return null;
+			RayTraceResult ray = Minecraft.getMinecraft().objectMouseOver;
+			if(ray!=null&&ray.typeOfHit==RayTraceResult.Type.BLOCK){
+				BlockPos pointing = ray.getBlockPos();
+				if(latestPointing==pointing){
+					if(++tick>200){
+						tick = 0;
+						RailReborn.NET.sendToServer(new MessagePipeRequest(pointing));
+					}
+				}else{
+					TileEntity te = p.world.getTileEntity(pointing);
+					if(te instanceof TEPipe){
+						latestPointing = pointing;
+						tick = 0;
+						RailReborn.NET.sendToServer(new MessagePipeRequest(pointing));
+					}
+				}
+				return;
+			}
+		}else if(wpl!=null) wpl = null;
+		latestPointing = null;
 	}
 	
 	@SubscribeEvent
 	public static void onTick(RenderWorldLastEvent event){
-		LinkedList<PipeLink> list;
-		synchronized(pipes){
-			list = new LinkedList<>(pipes);
+		WorldPipeLink wpl = FoolsGoggleEvent.wpl;
+		if(wpl==null) return;
+		else synchronized(wpl){
+			if(wpl.map().isEmpty()) return;
 		}
-		if(list.isEmpty()) return;
 		GL11.glPushMatrix();
 		final Entity entity = Minecraft.getMinecraft().getRenderViewEntity();
 		GL11.glTranslated(-(entity.lastTickPosX+(entity.posX-entity.lastTickPosX)*event.getPartialTicks()), -(entity.lastTickPosY+(entity.posY-entity.lastTickPosY)*event.getPartialTicks()), -(entity.lastTickPosZ+(entity.posZ-entity.lastTickPosZ)*event.getPartialTicks()));
@@ -113,9 +86,10 @@ public final class FoolsGoggleEvent{
 		GlStateManager.disableDepth();
 		GL11.glLineWidth(4f);
 		GlStateManager.color(1, 1, 0);
-		for(PipeLink l: list)
-			for(PipeNode node: l)
+		synchronized(wpl){
+			for(PipeNode node: wpl.map().values())
 				draw(node);
+		}
 		GlStateManager.disableBlend();
 		GlStateManager.enableTexture2D();
 		GlStateManager.enableDepth();
@@ -176,7 +150,10 @@ public final class FoolsGoggleEvent{
 	}
 	
 	public static void update(MessagePipeData message){
-		synchronized(pipes){
+		WorldPipeLink wpl = FoolsGoggleEvent.wpl;
+		if(wpl==null) return;
+		else synchronized(wpl){
+			/*
 			for(PipeLink l: pipes){
 				if(l.containsNode(message.pos)){
 					pipes.remove(l);
@@ -184,6 +161,7 @@ public final class FoolsGoggleEvent{
 				}
 			}
 			pipes.add(message.link);
+			*/
 		}
 	}
 }

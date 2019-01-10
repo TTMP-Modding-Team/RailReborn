@@ -10,6 +10,7 @@ import com.tictim.railreborn.multiblock.Blueprints;
 import com.tictim.railreborn.network.MessageDebug;
 import com.tictim.railreborn.network.MessagePipeData;
 import com.tictim.railreborn.network.MessagePipeRequest;
+import com.tictim.railreborn.pipelink.attachment.PipeAttachments;
 import com.tictim.railreborn.pipelink.handler.PipeHandlers;
 import com.tictim.railreborn.recipe.MachineRecipes;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -43,8 +44,10 @@ public class RailReborn{
 	public static final Logger LOGGER = LogManager.getLogger(NAME);
 	
 	{
-		PipeHandlers.INVALID.toString();
+		Registries.PIPE_HANDLERS.toString();
 		ModFluids.init();
+		PipeHandlers.INVALID.toString();
+		PipeAttachments.INVALID.toString();
 	}
 	
 	@EventHandler

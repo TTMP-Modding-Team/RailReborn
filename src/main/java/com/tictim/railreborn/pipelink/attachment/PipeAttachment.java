@@ -18,6 +18,10 @@ public interface PipeAttachment extends ICapabilityProvider, Debugable{
 	PipeAttachmentProvider getProvider();
 	
 	default void update(PipeNode node, EnumFacing facing){}
+	default boolean isDismantled(PipeNode node, EnumFacing facing){
+		return this.getProvider().getConnectionRequirement().isStateValid(node.isConnected(facing));
+	}
+	
 	/**
 	 * For rendering
 	 */

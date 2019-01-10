@@ -28,6 +28,12 @@ public final class ModBlocks{
 			return new ItemStack(COKE_OVEN_CORE);
 		}
 	};
+	public static final CreativeTabs TAB_PIPES = new CreativeTabs("railReborn.pipes"){
+		@Override
+		public ItemStack getTabIconItem(){
+			return PipeHandlers.D40.of();
+		}
+	};
 	
 	public static final Block COAL_COKE_BLOCK = new Block(Material.ROCK);
 	public static final Block ORE_TIN = new Block(Material.ROCK);
@@ -49,7 +55,7 @@ public final class ModBlocks{
 	public static final Block ENGINE_STEAM = new BlockEngine(Engines.STEAM);
 	public static final Block ENGINE_DIESEL = new BlockEngine(Engines.DIESEL);
 	
-	public static final Block PIPE_STUFFED = new BlockPipe(PipeHandlers.STUFFED);
+	public static final Block PIPES = new BlockPipe();
 	
 	public static final Block CREOSOTE_OIL = new BlockFluidClassic(ModFluids.CREOSOTE_OIL, Material.WATER);
 	public static final Block OIL = new BlockFluidClassic(ModFluids.OIL, Material.WATER);
@@ -77,7 +83,7 @@ public final class ModBlocks{
 		ENGINE_STEAM.setRegistryName("engine.steam").setUnlocalizedName("engine.steam").setHardness(5).setResistance(20).setCreativeTab(TAB_BLOCKS).setHarvestLevel("pickaxe", 1);
 		ENGINE_DIESEL.setRegistryName("engine.diesel").setUnlocalizedName("engine.diesel").setHardness(5).setResistance(20).setCreativeTab(TAB_BLOCKS).setHarvestLevel("pickaxe", 1);
 		
-		PIPE_STUFFED.setRegistryName("pipe.stuffed").setUnlocalizedName("pipe.stuffed").setHardness(2).setResistance(5).setCreativeTab(TAB_BLOCKS).setHarvestLevel("pickaxe", 0);
+		PIPES.setRegistryName("pipe").setUnlocalizedName("pipe").setHardness(2).setResistance(5).setCreativeTab(TAB_PIPES).setHarvestLevel("pickaxe", 0);
 		
 		CREOSOTE_OIL.setRegistryName("creosote_oil");
 		OIL.setRegistryName("oil");
@@ -108,7 +114,7 @@ public final class ModBlocks{
 		registry.register(ENGINE_STEAM);
 		registry.register(ENGINE_DIESEL);
 		
-		registry.register(PIPE_STUFFED);
+		registry.register(PIPES);
 		
 		registry.register(CREOSOTE_OIL);
 		registry.register(OIL);
