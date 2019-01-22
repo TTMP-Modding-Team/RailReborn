@@ -12,6 +12,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.IStringSerializable;
@@ -24,10 +25,13 @@ public class BlockEngine extends Block{
 	public static final PropertyEnum<State> STATE = PropertyEnum.create("state", State.class);
 	
 	private final Engines engine;
+
+	public float progress = 0;
 	
 	public BlockEngine(Engines engine){
 		super(Material.IRON);
 		this.engine = engine;
+		this.setDefaultState(this.blockState.getBaseState().withProperty(BlockHorizontal.FACING, EnumFacing.NORTH).withProperty(STATE, State.FLOOR));
 	}
 	
 	@Override
@@ -76,6 +80,12 @@ public class BlockEngine extends Block{
 	@Override
 	protected BlockStateContainer createBlockState(){
 		return new BlockStateContainer(this, BlockHorizontal.FACING, STATE);
+	}
+
+	@Override
+	public EnumBlockRenderType getRenderType(IBlockState state)
+	{
+		return EnumBlockRenderType.ENTITYBLOCK_ANIMATED;
 	}
 	
 	@Override

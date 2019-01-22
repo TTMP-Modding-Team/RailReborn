@@ -14,4 +14,5 @@ public class CommonProxy{
 		GameRegistry.registerTileEntity(TERainTank.class, new ResourceLocation(RailReborn.MODID, "rain_tank"));
 		GameRegistry.registerTileEntity(TEEngine.class, new ResourceLocation(RailReborn.MODID, "engine"));
 	}
+	public void registerRenderer(){}
 }

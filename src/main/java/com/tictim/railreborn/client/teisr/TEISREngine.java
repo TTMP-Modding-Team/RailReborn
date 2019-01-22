@@ -15,6 +15,6 @@ public class TEISREngine extends TileEntityItemStackRenderer{
 	
 	@Override
 	public void renderByItem(ItemStack stack, float partialTicks){
-		TileEntityRendererDispatcher.instance.render(this.te, 0, 0, 0, 0, partialTicks);
+//		TileEntityRendererDispatcher.instance.render(this.te, 0, 0, 0, 0, partialTicks);
 	}
 }

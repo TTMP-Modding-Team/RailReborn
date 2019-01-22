@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 public abstract class LogicEngine extends Logic implements RJ{
 	private long current;
 	private int fuelTicks;
+	public float progress = 0;
 	
 	{
 		this.valid = true;
@@ -23,11 +24,13 @@ public abstract class LogicEngine extends Logic implements RJ{
 	@Override
 	public void update(){
 		if(fuelTicks<=0){
+			progress = 0;
 			if(current >= capacityRJ()) return;
 			fuelTicks = this.fuel();
 		}
 		if(fuelTicks>0){
 			insertRJ(getRJPerTick(), true, false);
+			progress++;
 			fuelTicks--;
 		}
 	}

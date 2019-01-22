@@ -64,5 +64,6 @@ public class RailReborn{
 		
 		NET.registerMessage(new MessageDebug.Client(), MessageDebug.class, 0, Side.CLIENT);
 		NET.registerMessage(new MessageDebug.Server(), MessageDebug.class, 1, Side.SERVER);
+		proxy.registerRenderer();
 	}
 }

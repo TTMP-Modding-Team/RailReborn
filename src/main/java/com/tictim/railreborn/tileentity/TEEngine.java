@@ -4,6 +4,7 @@ import com.tictim.railreborn.api.RailRebornAPI;
 import com.tictim.railreborn.block.BlockEngine;
 import com.tictim.railreborn.enums.Engines;
 import com.tictim.railreborn.logic.Logic;
+import com.tictim.railreborn.logic.LogicEngine;
 import com.tictim.railreborn.util.NBTTypes;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.state.IBlockState;
@@ -15,7 +16,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.animation.AnimationTESR;
+import net.minecraftforge.common.animation.Event;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -24,6 +28,8 @@ import javax.annotation.Nullable;
 public class TEEngine extends TELogic implements ITickable{
 	@Nullable
 	private Engines engine;
+
+	public float progress = 0;
 	
 	public Engines getEngine(){
 		return this.engine;
@@ -34,7 +40,7 @@ public class TEEngine extends TELogic implements ITickable{
 		this.resetLogic();
 		return this;
 	}
-	
+
 	@Nullable
 	@Override
 	protected Logic createNewLogic(){
@@ -100,5 +106,11 @@ public class TEEngine extends TELogic implements ITickable{
 			default: // case CEILING:
 				return EnumFacing.DOWN;
 		}
+	}
+
+
+	public float getGenerateProgress() {
+		LogicEngine l = (LogicEngine) logic;
+		return l.progress;
 	}
 }
