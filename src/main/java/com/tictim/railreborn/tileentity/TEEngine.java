@@ -107,10 +107,19 @@ public class TEEngine extends TELogic implements ITickable{
 				return EnumFacing.DOWN;
 		}
 	}
-
-
+	private boolean waspeak=false;
 	public float getGenerateProgress() {
-		LogicEngine l = (LogicEngine) logic;
-		return l.progress;
+		//LogicEngine l = (LogicEngine) this.logic;
+		//return l.getGenerateProgress();
+		if(this.progress >= 5/16.0f) waspeak = true;
+		if(this.progress <= 0) waspeak = false;
+		if(!waspeak) this.progress = this.progress + 0.01f;
+		if(waspeak) this.progress = this.progress - 0.01f;
+		return this.progress;
+	}
+
+	@Override
+	public boolean hasFastRenderer() {
+		return true;
 	}
 }

@@ -23,6 +23,7 @@ import net.minecraftforge.fluids.FluidUtil;
 
 public class BlockEngine extends Block{
 	public static final PropertyEnum<State> STATE = PropertyEnum.create("state", State.class);
+	public static final PropertyEnum<Part> PART = PropertyEnum.create("part", Part.class);
 	
 	private final Engines engine;
 
@@ -31,7 +32,7 @@ public class BlockEngine extends Block{
 	public BlockEngine(Engines engine){
 		super(Material.IRON);
 		this.engine = engine;
-		this.setDefaultState(this.blockState.getBaseState().withProperty(BlockHorizontal.FACING, EnumFacing.NORTH).withProperty(STATE, State.FLOOR));
+		this.setDefaultState(this.blockState.getBaseState().withProperty(BlockHorizontal.FACING, EnumFacing.NORTH).withProperty(STATE, State.FLOOR).withProperty(PART, Part.BASE));
 	}
 	
 	@Override
@@ -79,15 +80,9 @@ public class BlockEngine extends Block{
 	
 	@Override
 	protected BlockStateContainer createBlockState(){
-		return new BlockStateContainer(this, BlockHorizontal.FACING, STATE);
+		return new BlockStateContainer(this, BlockHorizontal.FACING, STATE, PART);
 	}
 
-	@Override
-	public EnumBlockRenderType getRenderType(IBlockState state)
-	{
-		return EnumBlockRenderType.ENTITYBLOCK_ANIMATED;
-	}
-	
 	@Override
 	public boolean isFullCube(IBlockState state){
 		return false;
@@ -122,5 +117,14 @@ public class BlockEngine extends Block{
 		public String getName(){
 			return name().toLowerCase();
 		}
+	}
+
+	public enum Part implements IStringSerializable{
+		BASE,
+		LEFT,
+		RIGHT;
+
+		@Override
+		public String getName() {return name().toLowerCase();}
 	}
 }

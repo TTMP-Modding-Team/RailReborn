@@ -16,6 +16,8 @@ public abstract class LogicEngine extends Logic implements RJ{
 	private long current;
 	private int fuelTicks;
 	public float progress = 0;
+	public float prevprogress;
+	public float maxprogress=10;
 	
 	{
 		this.valid = true;
@@ -24,17 +26,27 @@ public abstract class LogicEngine extends Logic implements RJ{
 	@Override
 	public void update(){
 		if(fuelTicks<=0){
-			progress = 0;
+			//progress = 0;
 			if(current >= capacityRJ()) return;
 			fuelTicks = this.fuel();
+			//this.progress = this.progress - 0.1f;
 		}
 		if(fuelTicks>0){
 			insertRJ(getRJPerTick(), true, false);
-			progress++;
+			this.progress = this.progress + 0.1f;
 			fuelTicks--;
 		}
 	}
-	
+	public float getGenerateProgress()
+	{
+		/*float partialSlideProgress = prevprogress + (progress - prevprogress) * partialTicks;
+		float normalProgress = partialSlideProgress / (float) maxprogress;
+		return 0.815F * (1.0F - ((float) Math.sin(Math.toRadians(90.0 + 180.0 * normalProgress)) / 2.0F + 0.5F));
+*/
+		return this.progress;
+	}
+
+
 	protected abstract Engines getEngineType();
 	
 	/**
