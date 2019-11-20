@@ -16,8 +16,7 @@ public abstract class LogicEngine extends Logic implements RJ{
 	private long current;
 	private int fuelTicks;
 	public float progress = 0;
-	public float prevprogress;
-	public float maxprogress=10;
+	public boolean generating = false;
 	
 	{
 		this.valid = true;
@@ -26,24 +25,33 @@ public abstract class LogicEngine extends Logic implements RJ{
 	@Override
 	public void update(){
 		if(fuelTicks<=0){
-			//progress = 0;
+			this.generating = false;
+			generating = false;
 			if(current >= capacityRJ()) return;
 			fuelTicks = this.fuel();
-			//this.progress = this.progress - 0.1f;
 		}
 		if(fuelTicks>0){
+			this.generating = true;
+			generating = true;
 			insertRJ(getRJPerTick(), true, false);
-			this.progress = this.progress + 0.1f;
 			fuelTicks--;
 		}
 	}
+
 	public float getGenerateProgress()
 	{
-		/*float partialSlideProgress = prevprogress + (progress - prevprogress) * partialTicks;
-		float normalProgress = partialSlideProgress / (float) maxprogress;
-		return 0.815F * (1.0F - ((float) Math.sin(Math.toRadians(90.0 + 180.0 * normalProgress)) / 2.0F + 0.5F));
-*/
+		//if(fuelTicks <= 0) return false;
 		return this.progress;
+	}
+
+	@Override
+	public int getIntData() {
+		//if()
+		return fuelTicks;
+	}
+
+	public boolean isGenerating() {
+		return this.generating;
 	}
 
 
@@ -100,6 +108,7 @@ public abstract class LogicEngine extends Logic implements RJ{
 	public JsonElement getDebugInfo(){
 		JsonObject obj = new JsonObject();
 		obj.addProperty("Current RJ", currentRJ());
+		obj.addProperty("FuelTick", fuelTicks);
 		return Debugable.stateClassType(this.getClass(), obj);
 	}
 	

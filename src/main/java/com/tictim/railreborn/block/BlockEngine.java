@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLiving;
@@ -19,20 +20,23 @@ import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.PropertyFloat;
 import net.minecraftforge.fluids.FluidUtil;
+import org.omg.CosNaming.IstringHelper;
 
 public class BlockEngine extends Block{
 	public static final PropertyEnum<State> STATE = PropertyEnum.create("state", State.class);
 	public static final PropertyEnum<Part> PART = PropertyEnum.create("part", Part.class);
-	
+	public static final PropertyInteger LEVEL = PropertyInteger.create("level", 0, 5);
 	private final Engines engine;
 
-	public float progress = 0;
+	public int level = 0;
 	
 	public BlockEngine(Engines engine){
 		super(Material.IRON);
 		this.engine = engine;
 		this.setDefaultState(this.blockState.getBaseState().withProperty(BlockHorizontal.FACING, EnumFacing.NORTH).withProperty(STATE, State.FLOOR).withProperty(PART, Part.BASE));
+	    level=0;
 	}
 	
 	@Override
@@ -80,7 +84,7 @@ public class BlockEngine extends Block{
 	
 	@Override
 	protected BlockStateContainer createBlockState(){
-		return new BlockStateContainer(this, BlockHorizontal.FACING, STATE, PART);
+		return new BlockStateContainer(this, BlockHorizontal.FACING, STATE, PART, LEVEL);
 	}
 
 	@Override
@@ -107,7 +111,14 @@ public class BlockEngine extends Block{
 	public TileEntity createTileEntity(World world, IBlockState state){
 		return new TEEngine().setEngine(this.engine);
 	}
-	
+
+	@Override
+	public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
+    {
+        return state.withProperty(LEVEL, level);
+    }
+
+
 	public enum State implements IStringSerializable{
 		FLOOR,
 		WALL,
@@ -127,4 +138,8 @@ public class BlockEngine extends Block{
 		@Override
 		public String getName() {return name().toLowerCase();}
 	}
+
+	public void setLevel(int level) {
+	    this.level =level;
+    }
 }

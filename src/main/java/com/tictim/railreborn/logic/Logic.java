@@ -79,4 +79,6 @@ public abstract class Logic implements ITickable, ICapabilitySerializable<NBTTag
 		if(cap==Debugable.CAP) return (T)this;
 		else return null;
 	}
+
+	public int getIntData() {return 0;	}
 }

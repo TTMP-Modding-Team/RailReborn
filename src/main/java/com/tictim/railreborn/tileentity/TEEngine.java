@@ -1,5 +1,8 @@
 package com.tictim.railreborn.tileentity;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.tictim.railreborn.api.RailRebornAPI;
 import com.tictim.railreborn.block.BlockEngine;
 import com.tictim.railreborn.enums.Engines;
@@ -29,7 +32,10 @@ public class TEEngine extends TELogic implements ITickable{
 	@Nullable
 	private Engines engine;
 
-	public float progress = 0;
+	public int progress = 0;
+	public int generateTick = 0;
+
+	private boolean isMoving = false;
 	
 	public Engines getEngine(){
 		return this.engine;
@@ -60,7 +66,17 @@ public class TEEngine extends TELogic implements ITickable{
 	
 	@Override
 	public void update(){
-		if(!this.world.isRemote&&logic!=null) logic.update();
+		if(!this.world.isRemote&&logic!=null) {
+			this.logic.update();
+			LogicEngine elogic = (LogicEngine) this.logic;
+			this.isMoving = elogic.isGenerating();
+			if(this.isMoving) this.generateTick++;
+			else if (!this.isMoving && this.generateTick>0) {
+				this.generateTick--;
+			}
+			setProgress();
+		}
+
 	}
 	
 	@Override
@@ -107,15 +123,35 @@ public class TEEngine extends TELogic implements ITickable{
 				return EnumFacing.DOWN;
 		}
 	}
-	private boolean waspeak=false;
+	/*private boolean waspeak=false;
 	public float getGenerateProgress() {
-		//LogicEngine l = (LogicEngine) this.logic;
-		//return l.getGenerateProgress();
+		LogicEngine l = (LogicEngine) this.logic;
 		if(this.progress >= 5/16.0f) waspeak = true;
 		if(this.progress <= 0) waspeak = false;
 		if(!waspeak) this.progress = this.progress + 0.01f;
 		if(waspeak) this.progress = this.progress - 0.01f;
 		return this.progress;
+	}*/
+
+	public boolean isMoving() {
+		return this.isMoving;
+	}
+
+	public int getProgress() {
+		return this.progress;
+	}
+
+	public void setProgress() {
+		int i = this.generateTick;
+		if(i==0) this.progress = 0;
+		else if(0< i && i < 1200) this.progress = 1;
+		else if(1200 <= i && i < 1800) this.progress = 2;
+		else if(1800<= i && i < 2400) this.progress = 3;
+		else if(2400 < i) this.progress = 4;
+		else {
+			this.generateTick = 2400;
+			this.progress = 0;
+		}
 	}
 
 	@Override

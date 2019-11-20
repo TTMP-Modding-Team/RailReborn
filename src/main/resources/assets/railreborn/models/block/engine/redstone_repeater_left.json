@@ -1,11 +1,11 @@
 {
 	"parent": "block/block",
 	"textures": {
-		"6": "railreborn:block/engine/steam/piston_bottom",
-		"7": "railreborn:block/engine/steam/piston_front",
-		"8": "railreborn:block/engine/steam/piston_side",
-		"9": "railreborn:block/engine/steam/piston_top",
-		"particle": "railreborn:block/engine/steam/particle"
+		"6": "railreborn:block/engine/redstone_repeater/piston_bottom",
+		"7": "railreborn:block/engine/redstone_repeater/piston_front",
+		"8": "railreborn:block/engine/redstone_repeater/piston_side",
+		"9": "railreborn:block/engine/redstone_repeater/piston_top",
+		"particle": "railreborn:block/engine/redstone_repeater/particle"
 	},
 	"elements": [
 		{

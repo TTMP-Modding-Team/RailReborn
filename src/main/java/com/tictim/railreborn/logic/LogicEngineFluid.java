@@ -45,13 +45,14 @@ public abstract class LogicEngineFluid extends LogicEngine{
 		if(nbt.hasKey("fluidTank", NBTTypes.COMPOUND)) tank.readFromNBT(nbt.getCompoundTag("fluidTank"));
 	}
 	
-	@Override
+/*	@Override
 	public JsonElement getDebugInfo(){
 		JsonObject obj = new JsonObject();
 		obj.add("Fluid Tank", Debugable.debugFluidTank(this.tank));
 		obj.addProperty("Current RJ", currentRJ());
+		//super.getDebugInfo();
 		return Debugable.stateClassType(this.getClass(), obj);
-	}
+	}*/
 	
 	@Override
 	public boolean hasCapability(Capability<?> cap, EnumFacing facing){
